@@ -334,7 +334,7 @@ if SC3_PLUGINS:
 # Post envelope effects    
 
 fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
-fx.add("osc = LinXFade2.kr(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
 fx.save()
 
 fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1}, order=2)
@@ -342,7 +342,7 @@ fx.add("osc = osc * SinOsc.ar( tremolo / beat_dur, mul:0.5, add:0.5)")
 fx.save()
 
 fx = FxList.new('echo', 'combDelay', {'echo': 0, 'echomix' : 1, 'beat_dur': 1, 'echotime': 1}, order=2)
-fx.add('osc = LinXFade2.kr(osc + CombL.ar(osc, delaytime: echo * beat_dur, maxdelaytime: 2 * beat_dur, decaytime: echotime * beat_dur), osc, 1-echomix)')
+fx.add('osc = LinXFade2.ar(osc + CombL.ar(osc, delaytime: echo * beat_dur, maxdelaytime: 2 * beat_dur, decaytime: echotime * beat_dur), osc, 1-echomix)')
 fx.save()
 
 fx = FxList.new('spin', 'spinPan', {'spin': 0,'sus': 1}, order=2)
