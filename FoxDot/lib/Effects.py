@@ -362,12 +362,12 @@ fx.add("formant = (formant % 8) + 1")
 fx.add("osc = LinXFade2.ar(Formlet.ar(osc, formant * 200, ((formant % 5 + 1)) / 1000, (formant * 1.5) / 600).tanh), osc, 1-formantmix)")
 fx.save()
 
-fx = FxList.new("shape", "wavesShapeDistortion", {"shape":0}, order=2)
-fx.add("osc = (osc * (shape * 50)).fold2(1).distort / 5")
+fx = FxList.new("shape", "wavesShapeDistortion", {"shape":0, "shapemix":1}, order=2)
+fx.add("osc = LinXFade2.ar((osc * (shape * 50)).fold2(1).distort / 5, osc, 1-shapemix)")
 fx.save()
 
-fx = FxList.new("drive", "overdriveDistortion", {"drive":0}, order=2)
-fx.add("osc = (osc * (drive * 50)).clip(0,0.2).fold2(2)")
+fx = FxList.new("drive", "overdriveDistortion", {"drive":0, "drivemix":1}, order=2)
+fx.add("osc = LinXFade2.ar((osc * (drive * 50)).clip(0,0.2).fold2(2), osc, 1-shapemix)")
 fx.save()
 
 In(); Out()
