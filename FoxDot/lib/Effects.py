@@ -334,7 +334,7 @@ if SC3_PLUGINS:
 # Post envelope effects    
 
 fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
-fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+fx.add("osc = LinXFade2.kr(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
 fx.save()
 
 fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1}, order=2)
