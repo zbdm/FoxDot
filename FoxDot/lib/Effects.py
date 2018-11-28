@@ -337,8 +337,8 @@ fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
 fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
 fx.save()
 
-fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1}, order=2)
-fx.add("osc = osc * SinOsc.ar( tremolo / beat_dur, mul:0.5, add:0.5)")
+fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1, 'tremolomix': 1}, order=2)
+fx.add("osc = LinXFade2.ar(osc * SinOsc.ar( tremolo / beat_dur, mul:0.5, add:0.5), osc, 1-tremolomix)")
 fx.save()
 
 fx = FxList.new('echo', 'combDelay', {'echo': 0, 'echomix' : 1, 'beat_dur': 1, 'echotime': 1}, order=2)
@@ -357,9 +357,9 @@ fx = FxList.new('room', 'reverb', {'room': 0, 'mix': 0.1}, order=2)
 fx.add("osc = FreeVerb.ar(osc, mix, room)")
 fx.save()
 
-fx = FxList.new("formant", "formantFilter", {"formant": 0}, order=2)
+fx = FxList.new("formant", "formantFilter", {"formant": 0, 'formantmix': 1}, order=2)
 fx.add("formant = (formant % 8) + 1")
-fx.add("osc = Formlet.ar(osc, formant * 200, ((formant % 5 + 1)) / 1000, (formant * 1.5) / 600).tanh")
+fx.add("osc = LinXFade2.ar(Formlet.ar(osc, formant * 200, ((formant % 5 + 1)) / 1000, (formant * 1.5) / 600).tanh), osc, 1-formantmix)")
 fx.save()
 
 fx = FxList.new("shape", "wavesShapeDistortion", {"shape":0}, order=2)
