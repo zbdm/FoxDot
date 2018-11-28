@@ -6,11 +6,11 @@ CRASH SERVER EDITS
 =====================================
 29.11.2018
 ### added basic fx mix controls, examples :
-b1 >> play("X ", drive=1, drivemix=0.5)
-b2 >> play("X ", shape=2, shapemix=0.5)
-b4 >> klank(sus=4, dur=4, chop=4, chopmix=1)
-b5 >> klank(sus=4, dur=4, tremolo=32, tremolomix=1)
-b6 >> klank(sus=4, oct=(3, 4), echo=0.5, echomix=0)
+- b1 >> play("X ", drive=1, drivemix=0.5)
+- b2 >> play("X ", shape=2, shapemix=0.5)
+- b4 >> klank(sus=4, dur=4, chop=4, chopmix=1)
+- b5 >> klank(sus=4, dur=4, tremolo=32, tremolomix=1)
+- b6 >> klank(sus=4, oct=(3, 4), echo=0.5, echomix=0)
 
 
 
