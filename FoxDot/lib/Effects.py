@@ -357,9 +357,15 @@ fx = FxList.new('room', 'reverb', {'room': 0, 'mix': 0.1}, order=2)
 fx.add("osc = FreeVerb.ar(osc, mix, room)")
 fx.save()
 
+fx = FxList.new('jpverb', 'jpverb', {'jpverb': 0, 'damp': 0, 'jpmix':1}, order=2)
+fx.add("osc = LinXFade2.ar(JPverb.ar(osc, jpverb, damp, earlyDiff: 0.707, modDepth: 0.1, modFreq: 2, low: 1, mid: 1, high: 1, lowcut: 500, highcut: 2000),  osc, 1-jpmix)")
+fx.save()
+
+
+
 fx = FxList.new("formant", "formantFilter", {"formant": 0, 'formantmix': 1}, order=2)
 fx.add("formant = (formant % 8) + 1")
-fx.add("osc = LinXFade2.ar(Formlet.ar(osc, formant * 200, ((formant % 5 + 1)) / 1000, (formant * 1.5) / 600).tanh, osc, 1-formantmix);")
+fx.add("osc = LinXFade2.ar(Formlet.ar(osc, formant * 200, ((formant % 5 + 1)) / 1000, (formant * 1.5) / 600).tanh, osc, 1-formantmix)")
 fx.save()
 
 fx = FxList.new("shape", "wavesShapeDistortion", {"shape":0, "shapemix":1}, order=2)
