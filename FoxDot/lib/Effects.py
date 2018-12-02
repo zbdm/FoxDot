@@ -376,5 +376,9 @@ fx = FxList.new("drive", "overdriveDistortion", {"drive":0, "drivemix":1}, order
 fx.add("osc = LinXFade2.ar((osc * (drive * 50)).clip(0,0.2).fold2(2), osc, 1-drivemix)")
 fx.save()
 
+fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octafuz':1}, order=2)
+fx.add("osc = LinXFade2.ar(JPverb.ar(osc, jpverb, damp, earlyDiff: 0.707, modDepth: 0.1, modFreq: 2, low: 1, mid: 1, high: 1, lowcut: 500, highcut: 2000),  osc, 1-jpmix)")
+fx.save()
+
 In(); Out()
 Effect.server.setFx(FxList)
