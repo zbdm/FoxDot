@@ -361,7 +361,9 @@ fx = FxList.new('jpverb', 'jpverb', {'jpverb': 0, 'damp': 0, 'jpmix':1}, order=2
 fx.add("osc = LinXFade2.ar(JPverb.ar(osc, jpverb, damp, earlyDiff: 0.707, modDepth: 0.1, modFreq: 2, low: 1, mid: 1, high: 1, lowcut: 500, highcut: 2000),  osc, 1-jpmix)")
 fx.save()
 
-
+fx = FxList.new('flanger', 'flanger', {'flanger': 0, 'fdecay': 0, 'flangermix':1}, order=2)
+fx.add("osc = LinXFade2.ar(CombC.ar(osc, 0.01, SinOsc.ar(flanger, 0, (0.01 * 0.5) - 0.001, (0.01 * 0.5) + 0.001), fdecay, 1),  osc, 1-flangermix)")
+fx.save()
 
 fx = FxList.new("formant", "formantFilter", {"formant": 0, 'formantmix': 1}, order=2)
 fx.add("formant = (formant % 8) + 1")
