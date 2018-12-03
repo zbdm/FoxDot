@@ -75,7 +75,7 @@ DESCRIPTIONS = { 'a' : "Gameboy hihat",      'A' : "Gameboy kick drum",
                  's' : "-Shaker",            'S' : "Tamborine",
                  't' : "-Tom",               'T' : "Cowbell",
                  'u' : "Soft snare",         'U' : "-Misc. Fx",
-                 'v' : "-sub kick",          'V' : "Hard kick",
+                 'v' : "-Sub kick",          'V' : "Hard kick",
                  'w' : "-Bass boom",         'W' : "Distorted",
                  'x' : "-Bass drum",         'X' : "Heavy kick",
                  'y' : "-Percussive hits",   'Y' : "High buzz",
@@ -86,7 +86,7 @@ DESCRIPTIONS = { 'a' : "Gameboy hihat",      'A' : "Gameboy kick drum",
                  '~' : "-Ride cymbal",       "%" : "Noise bursts",
                  '^' : "'Donk'",             "$" : "Beatbox",
                  '#' : "-Crash",             "!" : "Yeah!",
-                 '+' : "-Clicks",             "&" : "Chime",
+                 '+' : "-Clicks",            "&" : "Chime",
                  '@' : "Gameboy noise",      ":" : "Hi-hats",
                  '1' : "Vocals (One)",
                  '2' : 'Vocals (Two)',
@@ -430,7 +430,7 @@ class LoopSynthDef(SampleSynthDef):
     def __call__(self, filename, pos=0, sample=0, **kwargs):
         kwargs["buf"] = Samples.loadBuffer(filename, sample)
         return SampleSynthDef.__call__(self, pos, **kwargs)
-    
+
 class BeatStretchSynthDef(SampleSynthDef):
     def __init__(self):
         SampleSynthDef.__init__(self, "stretch")
@@ -460,7 +460,7 @@ class GranularSynthDef(SampleSynthDef):
     def __call__(self, filename, pos=0, sample=0, **kwargs):
         kwargs["buf"] = Samples.loadBuffer(filename, sample)
         return SampleSynthDef.__call__(self, pos, **kwargs)
-    
+
 stretch = BeatStretchSynthDef()
 loop = LoopSynthDef()
 gsynth = GranularSynthDef()
