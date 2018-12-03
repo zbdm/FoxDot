@@ -103,6 +103,7 @@ SynthDef(\osc_table, {
 
 	ReplaceOut.ar(bus, Splay.ar(sig));
 }).add;
+
 SynthDef(\osc_table_var, {
 	arg gate=1, amp=0.5, bus=0, rel=1;
 	var sig, env;
@@ -335,5 +336,55 @@ SynthDef(\dfm, {
 	ReplaceOut.ar(bus, Splay.ar(sig));
 }).add;
 
+//////////Zbdm Synth//////////
 
+/////!! Small dur = Server(40%) !!///////
+(
+SynthDef(\coreNoiz, {
+	|amp=1, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.001, decay=0.001, sus=0.55,rel=0.125, peak=1, level=0.8, gate=1, lfofreq = 3, lopfreq = 800, rq = 0.5, detune1 = 12, detune2 = 8|
+
+	var env, nvoices1=2, nvoices2=4, osc1, m, lfo, osc2, output;
+
+	sus = sus * blur;
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+
+	env = EnvGen.ar(Env.adsr(atk, decay, sus, rel, amp), gate, doneAction:2);
+
+	osc1 = {
+		 m = 2**(detune1/1200).rand2;
+		 lfo = SinOsc.ar(lfofreq.rand).range(0,1);
+		DelayC.ar(LFSaw.ar(m * freq/2), 0.02, freq.reciprocal.rand * lfo);
+	}.dup(nvoices1);
+
+	osc2 = {
+		 m = 2**(detune2/1200).rand2;
+		 lfo = SinOsc.ar(lfofreq.rand).range(0,1);
+		DelayC.ar(LFSaw.ar(m * freq), 0.02, freq.reciprocal.rand * lfo);
+	}.dup(nvoices2);
+
+	output = Pan2.ar(output*amp*env*0.1, pan);
+	Out.ar(bus, output);
+}).add;
+)
+
+
+/////Cool with small dur, low CPU////
+(
+SynthDef("profenstring", {
+	arg amp=0.3, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.5, sus=1, rel=0, peak=1, level=0.8, gate = 1, lforate = 10, lfowidth = 0.5, cutoff = 12000, rq = 0.5;
+
+	var lfo, pulse, filter, env;
+	lfo = LFTri.kr(lforate * [1, 1.01], Rand(0, 2.0) ! 2);
+	pulse = Pulse.ar(freq * [1, 1.01], lfo * lfowidth + 0.5);
+	filter = RLPF.ar(pulse, cutoff, rq);
+	env = EnvGen.ar(
+		envelope: Env.adsr(atk, decay, sus, rel, amp),
+		gate: gate,
+		doneAction: 2);
+	Out.ar(bus, Pan2.ar(
+		in: Mix(filter*amp*0.4) * env,
+		pos: pan)
+	);
+}).add;
 )

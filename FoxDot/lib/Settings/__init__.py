@@ -52,8 +52,8 @@ FOXDOT_ROOT  = os.path.realpath(__file__ + "/../../../")
 FOXDOT_ICON  = os.path.realpath(FOXDOT_ROOT + "/lib/Workspace/img/icon.ico")
 FOXDOT_ICON_GIF = os.path.realpath(FOXDOT_ROOT + "/lib/Workspace/img/icon.gif")
 FOXDOT_HELLO = os.path.realpath(FOXDOT_ROOT + "/lib/Workspace/img/hello.txt")
-FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/snd/")
-FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/snd/_loop_/")
+FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd/")
+FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
 
 SCLANG_EXEC   = 'sclang.exe' if SYSTEM == WINDOWS else 'sclang'
 SYNTHDEF_DIR  = os.path.realpath(FOXDOT_ROOT + "/osc/scsyndef/")
@@ -95,7 +95,7 @@ from . import conf
 reload(conf) # incase of a reload
 
 FOXDOT_CONFIG_FILE  = conf.filename
-    
+
 ADDRESS                   = conf.ADDRESS
 PORT                      = conf.PORT
 PORT2                     = conf.PORT2
