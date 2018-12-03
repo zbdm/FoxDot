@@ -55,38 +55,38 @@ nonalpha = {"&" : "ampersand",
             "4" : "4" }
 
 DESCRIPTIONS = { 'a' : "Gameboy hihat",      'A' : "Gameboy kick drum",
-                 'b' : "Noisy beep",         'B' : "Short saw",
-                 'c' : "Voice/string",       'C' : "Choral",
+                 'b' : "Noisy beep",         'B' : "-saw/bass",
+                 'c' : "-Clap",              'C' : "Choral",
                  'd' : "Woodblock",          'D' : "Dirty snare",
                  'e' : "Electronic Cowbell", 'E' : "Ringing percussion",
                  'f' : "Pops",               'F' : "Trumpet stabs",
-                 'g' : "Ominous",            'G' : "Ambient stabs",
+                 'g' : "Ominous",            'G' : "-Gabber",
                  'h' : "Finger snaps",       'H' : "Clap",
-                 'i' : "Jungle snare",       'I' : "Rock snare",
+                 'i' : "-Indus Hits",        'I' : "-Indus ",
                  'j' : "Whines",             'J' : "Ambient stabs",
-                 'k' : "Wood shaker",        'K' : "Percussive hits",
-                 'l' : "Robot noise",        'L' : "Noisy percussive hits",
+                 'k' : "-kick acc drum",     'K' : "Percussive hits",
+                 'l' : "Robot noise",        'L' : "Gameboy SFX",
                  'm' : "808 toms",           'M' : "Acoustic toms",
-                 'n' : "Noise",              'N' : "Gameboy SFX",
+                 'n' : "-Noise",             'N' : "-Noisy hits",
                  'o' : "Snare drum",         'O' : "Heavy snare",
                  'p' : "Tabla",              'P' : "Tabla long",
-                 'q' : "Ambient stabs",      'Q' : "Electronic stabs",
+                 'q' : "-Ambient",           'Q' : "Ambient stabs",
                  'r' : "Metal",              'R' : "Metallic",
-                 's' : "Shaker",             'S' : "Tamborine",
-                 't' : "Rimshot",            'T' : "Cowbell",
-                 'u' : "Soft snare",         'U' : "Misc. Fx",
-                 'v' : "Soft kick",          'V' : "Hard kick",
-                 'w' : "Dub hits",           'W' : "Distorted",
-                 'x' : "Bass drum",          'X' : "Heavy kick",
-                 'y' : "Percussive hits",    'Y' : "High buzz",
+                 's' : "-Shaker",            'S' : "Tamborine",
+                 't' : "-Tom",               'T' : "Cowbell",
+                 'u' : "Soft snare",         'U' : "-Misc. Fx",
+                 'v' : "-sub kick",          'V' : "Hard kick",
+                 'w' : "-Bass boom",         'W' : "Distorted",
+                 'x' : "-Bass drum",         'X' : "Heavy kick",
+                 'y' : "-Percussive hits",   'Y' : "High buzz",
                  'z' : "Scratch",            "Z" : "Loud stabs",
-                 '-' : "Hi hat closed",      "|" : "Hangdrum",
-                 '=' : "Hi hat open",        "/" : "Reverse sounds",
-                 '*' : "Clap",               "\\" : "Lazer",
-                 '~' : "Ride cymbal",        "%" : "Noise bursts",
+                 '-' : "-Hi hat closed",     "|" : "Hangdrum",
+                 '=' : "-Hi hat open",       "/" : "Reverse sounds",
+                 '*' : "-Clap",              "\\" : "Lazer",
+                 '~' : "-Ride cymbal",       "%" : "Noise bursts",
                  '^' : "'Donk'",             "$" : "Beatbox",
-                 '#' : "Crash",              "!" : "Yeah!",
-                 '+' : "Clicks",             "&" : "Chime",
+                 '#' : "-Crash",             "!" : "Yeah!",
+                 '+' : "-Clicks",             "&" : "Chime",
                  '@' : "Gameboy noise",      ":" : "Hi-hats",
                  '1' : "Vocals (One)",
                  '2' : 'Vocals (Two)',
@@ -96,11 +96,11 @@ DESCRIPTIONS = { 'a' : "Gameboy hihat",      'A' : "Gameboy kick drum",
 # Function-like class for searching directory for sample based on symbol
 
 class _symbolToDir:
-    
+
     def __init__(self, root):
-    
+
         self.set_root(root)
-    
+
     def set_root(self, root):
         """ Check if root is a valid directory then points FoxDot to that
             folder for searching for samples. Raises an OSError if 'root'

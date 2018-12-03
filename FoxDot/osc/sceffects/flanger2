@@ -1,0 +1,18 @@
+(SynthDef.new(\flanger,
+	{|bus, flgdelay, flgdepth, flgrate, flgfb|
+    var osc, dsig, local;
+    osc = In.ar(bus, 2);
+    local = LocalIn.ar(2);
+    dsig = AllpassL.ar(osc + (local * flgfb), 0.013 * 2, LFPar.kr(flgrate * 10.0,0,flgdepth * maxdelay,flgdelay * maxdelay),0.0);
+    osc = osc + dsig;
+    LocalOut.ar(osc);
+    ReplaceOut.ar(bus, osc);
+}).add;
+)
+
+SynthDef(\flanger,
+	{|bus, rate = 1, maxDelay = 0.01, minDelay = 0.001, decayTime = 1, amp = 1|
+	var input = In.ar(in, 1);
+	var flanged = CombC.ar(input, maxDelay, SinOsc.ar(rate, 0, (maxDelay * 0.5) - minDelay, (maxDelay * 0.5) + minDelay), decayTime, amp);
+	ReplaceOut.ar(out, flanged);
+}).add;
