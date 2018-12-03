@@ -433,7 +433,7 @@ class LoopSynthDef(SampleSynthDef):
     
 class BeatStretchSynthDef(SampleSynthDef):
     def __init__(self):
-        SampleSynthDef.__init__(self, "loop")
+        SampleSynthDef.__init__(self, "stretch")
         self.pos = self.new_attr_instance("pos")
         self.sample = self.new_attr_instance("sample")
         self.defaults['pos']   = 0
