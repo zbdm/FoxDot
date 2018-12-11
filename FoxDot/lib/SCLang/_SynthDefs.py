@@ -403,6 +403,15 @@ dbass.add()
 sinepad = FileSynthDef("sinepad") 
 sinepad.add()
 
+pianovel = FileSynthDef("pianovel") 
+pianovel.add()
+
+faim = FileSynthDef("faim") 
+faim.add()
+
+prof = FileSynthDef("prof") 
+prof.add()
+
 # Get rid of the variable synth
 
 del synth
