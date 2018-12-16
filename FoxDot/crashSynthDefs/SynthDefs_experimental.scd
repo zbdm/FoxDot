@@ -232,15 +232,17 @@ SynthDef(\osc_table_var, {
 	ReplaceOut.ar(bus, Splay.ar(sig));
 }).add;
 
-SynthDef(\drum_bass, { |amp = 0.25, freq = 42, pulse = 0.1, attackFreq = 100, decay = 0.075, bus=0,
-	sustain = 3, pan = 0|
+SynthDef(\click_base, { |amp = 0.25, freq = 42, bus=0, fmod=0,
+	sus = 1, pan = 0|
 	var sig;
-	sig = BLowPass.ar( Impulse.ar(0,0,pulse), 8000 );
+	sig = BLowPass.ar(Impulse.ar(8,0,4), freq*10, 0.1);
 	sig = sig + LFPar.ar(
-		Env.perc(0,decay).ar.linexp(0,1,freq, attackFreq) *
-		LFDNoise3.kr(0.1).exprange(-0.1.midiratio, 0.1.midiratio),
+		Env.perc(0,0.075).ar.linexp(0,1,freq, 1600) *
+		LFDNoise3.kr(2).exprange(fmod.midiratio, 0.1.midiratio),
 		-1);
-	sig = sig * Env([1,0], [sustain], -4).kr(2);
+	sig = sig * Env([1,0], [sus], -4).kr(2);
+	sig = Mix(sig) * 1;
+	sig = Pan2.ar(sig, pan);
 	ReplaceOut.ar(bus,Splay.ar( sig * amp ))
 }).add;
 
