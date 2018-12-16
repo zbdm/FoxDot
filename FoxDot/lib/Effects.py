@@ -333,9 +333,16 @@ if SC3_PLUGINS:
 
 # Post envelope effects
 
-fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
-fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+#New Chop, with wave select :
+#chopwave = (0: Pulse, 1: Tri, 2: Saw, 3: Sin, 4: Parabolic )
+# and chopi = oscillator phase
+fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1, 'chopwave': 0, 'chopi': 0}, order=2)
+fx.add("osc = LinXFade2.ar(osc * SelectX.kr(chopwave, [LFPulse.kr(chop / sus, iphase:chopi, add: 0.01), LFTri.kr(chop / sus, iphase:chopi, add: 0.01), LFSaw.kr(chop / sus, iphase:chopi, add: 0.01), FSinOsc.kr(chop / sus, iphase:chopi, add: 0.01), LFPar.kr(chop / sus, iphase:chopi, add: 0.01)]), osc, 1-chopmix)")
 fx.save()
+
+#fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
+#fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+#fx.save()
 
 fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1, 'tremolomix': 1}, order=2)
 fx.add("osc = LinXFade2.ar(osc * SinOsc.ar( tremolo / beat_dur, mul:0.5, add:0.5), osc, 1-tremolomix)")
