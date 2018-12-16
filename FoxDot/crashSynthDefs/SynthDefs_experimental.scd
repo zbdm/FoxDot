@@ -7,6 +7,39 @@ StageLimiter.activate;
 )
 // SynthDefs
 
+
+// ChaosGens synth, use selector (mtype), from 0 to 5 to switch UGens, the vib parameter is not really a vib but changes some stuff, can make some great basslines with some params. 
+SynthDef(\mnoise, {
+	arg amp=1, bus=0,mtype=0, freq=40, gate=1, sus=1, fmod=0, blur=1, vib=0, pan=0;
+	var a, osc, env;
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	
+	osc = Select.ar(mtype, [
+		
+	LinCongN.ar(freq, 4, 0.6, 4, vib),                            
+	LatoocarfianN.ar(freq + fmod, 4, 1, xi:vib),                               
+	Gendy5.ar(0.1, 4, 0.1, 0, freq, freq +  fmod, ampscale: 0.1),                
+	GbmanL.ar((freq*2) + fmod, xi: vib),
+	CuspN.ar(freq, 1.9, xi: vib),
+	StandardN.ar(freq, 1, xi: 1, yi: 2);
+		
+	]);
+	
+	osc = osc.tanh;
+	osc = Limiter.ar(osc,0.999);
+
+	
+	env=EnvGen.ar(Env([0,1,0.8,0.8,0], [0.02, 0.01, sus/2, sus/2]), doneAction: 0);
+	osc = Mix(osc) * 0.4;
+	osc = Pan2.ar(osc, pan);
+	ReplaceOut.ar(bus, (osc * amp) * env);
+		
+}).add;
+)
+
+
 (
 SynthDef(\faim2, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=0, fmod=0, vib=0, rate=1, blur=1, beat_dur=1, vibr=0;
 	var sig;
