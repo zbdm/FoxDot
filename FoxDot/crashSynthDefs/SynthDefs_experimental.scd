@@ -9,6 +9,7 @@ StageLimiter.activate;
 
 
 // ChaosGens synth, use selector (mtype), from 0 to 5 to switch UGens, the vib parameter is not really a vib but changes some stuff, can make some great basslines with some params. 
+// can be used as a noise gen on lower freq or bassline. Some combinations don't work well some mtype and low oct for ex, nearly always add some vib
 SynthDef(\mnoise, {
 	arg amp=1, bus=0,mtype=0, freq=40, gate=1, sus=1, fmod=0, blur=1, vib=0, pan=0;
 	var a, osc, env;
