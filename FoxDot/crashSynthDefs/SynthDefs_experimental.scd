@@ -114,23 +114,23 @@ osc = Pan2.ar(osc, pan);
 )
 
 
-
 SynthDef(\glitchcore, {
-	arg bus =0, amp= 0.5, gate=1, dur=1, sawFreq=1;
+	arg bus =0, amp= 0.5, gate=1, dur=1, sawFreq=1, pan=0;
 	var sigbase, sigmod, sig, env, env2, bass;
 	env =  EnvGen.ar(Env.adsr(0, 0, 0.5, dur), gate, doneAction: 2);
 	env2 = EnvGen.ar(Env.perc(0, 0.1), gate);
 	sigbase = LocalBuf(1e4,2).clear;
 	bass = CombL.ar(env2 * SinOsc.ar(54, mul: 8), 8);
 	sigmod = Sweep.ar(BufRd.ar(2, sigbase, Saw.ar(sawFreq, 4, 125)), 5e5);
-	sig = BufWr.ar(SinOsc.ar([1, 120]), sigbase, sigmod); //SinOsc / LFPulse / Saw
+	sig = BufWr.ar(SinOsc.ar([1, 120]), sigbase, sigmod); 
 	sig = BufRd.ar(2, sigbase, sigmod) ;
 	sig = (sig.tanh + bass);
 	sig = sig + RHPF.ar(sig,3200, 1, 2);
 	sig = sig + 2 * BPF.ar(sig, 200, 2);
-	sig = LPF.ar(sig, 400);
+	sig = LPF.ar(sig, 6400);
 	sig = CompanderD.ar(sig,8/4,1/3,1/10);
-	sig = sig * amp;
+	sig  = Mix(sig) * 0.4;
+	sig = Pan2.ar(sig * amp, pan);
     ReplaceOut.ar(bus, sig * env);
 
 }).add;
