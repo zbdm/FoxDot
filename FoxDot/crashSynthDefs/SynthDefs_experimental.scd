@@ -186,14 +186,23 @@ SynthDef(\electricity, {
 	ReplaceOut.ar(bus, (sig * amp) * env);
 }).add;
 
-SynthDef(\drone, { arg bus = 0, speed = 1, amp = 0.5, sus = 4, dur = 1, freq=200, gate=1, hpf=40;
+SynthDef(\drone, { arg bus = 0, speed = 1, amp = 0.5, pan=0, sus = 4, dur = 1, freq=200, gate=1, hpf=40, fmod=0, vib=0;
+	var sig;
 	var base_signal = LFNoise1;
-
     var adsr = EnvGen.ar(Env.linen(0.1,sus,0.1, 1, -3),gate,doneAction:2);
-	var sig =  HPF.ar(FreeVerb2.ar(*XFade2.ar(SinOscFB.ar([20,freq],base_signal.ar(speed*2)+1),
-	SinOscFB.ar([freq,freq],base_signal.ar(speed)+1/2),base_signal.ar(40))),hpf);
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	sig =  HPF.ar(
+		FreeVerb2.ar(
+			*XFade2.ar
+			(SinOscFB.ar([freq,freq],base_signal.ar(speed*2)+1),
+			 SinOscFB.ar([freq,freq + fmod],base_signal.ar(speed)+vib),base_signal.ar(120))),hpf);
+
 	sig = LeakDC.ar((sig * 1.1).tanh, 0.999);
 	sig = (sig * adsr) * amp;
+	sig  = Mix(sig) * 0.4;
+	sig = Limiter.ar(sig, 0.99);
+	sig = Pan2.ar(sig * amp, pan);
 	ReplaceOut.ar(bus, sig);
 }).add;
 
