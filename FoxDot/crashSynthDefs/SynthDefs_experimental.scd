@@ -186,15 +186,30 @@ SynthDef(\rsin, {
 	ReplaceOut.ar(bus, (sig * amp));
 }).add;
 
-SynthDef(\electric, { arg bus=0,vib=1, destroy=4, mult=9999, amp=0.1, pan=0,gate=1, rel= 1, saw=12, dur=1;
-	var sig =  Saw.ar(saw)*mult+CuspN.ar(100, 0.1)*0.00001;
-	var sig2 = Gendy5.ar(vib).lag+2/[2.02,3]/99++9;
-	var sig4 = LFNoise0.ar(1/2).lag+destroy/[2.02,3]/99++9;
-	var sig3 = BPF.ar(sig, 440, 4);
-	var env =  EnvGen.ar(Env.linen(0.0,dur,0),doneAction:2);
-	sig3 =     FreeVerb.ar(CombN.ar(sig3, 1, (sig2/8) + sig4,9),0.25);
-	sig3 =     sig3.sum.tanh!2;
+(
+SynthDef(\electric, { 
+	arg bus=0,vib=1, amp=1, sus=1,blur=1, pan=0,gate=1, rel= 1, dur=1, freq=440;
+	var sig, sig2, sig4, sig3, env;
+	
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	sig =  Saw.ar(freq)*9504+ CuspN.ar(freq, 0.1)*0.00001;
+	sig2 = Gendy5.ar(vib).lag/[2.01,3]/99++9;
+	sig4 = LFNoise0.ar(1/2).lag+4/[2.01,3]/99++9;
+	sig3 = sig.tanh;
+	env =  EnvGen.ar(Env.linen(0.3,dur,0),doneAction:2);
+			
+	sig3 = CombN.ar(sig3, 1, (sig2/32) + sig4,9);
+	sig3 = sig3.sum.tanh!2;
+	
+	sig3 = Mix(sig3) * 0.5;
+	sig3 = Pan2.ar(sig3, pan);
+	
 	ReplaceOut.ar(bus, (sig3 * amp) * env);}).add;
+
+)
+
 
 SynthDef(\radiostatic, { |bus=0, freq=800, gate=1, amp=0.5, dur=0.25, pan=0|
 	var env = EnvGen.ar(Env.asr(0,1),gate,doneAction:2);
