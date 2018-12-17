@@ -1,13 +1,12 @@
-
-(
-FoxDot.start;
-
-StageLimiter.activate;
-
-)
 // SynthDefs
+// CURRENT LIST 
+// 1. mnoise : a chaosGen based Synth with multiple variations 
+// 2. glitchcore
+// 3. 
 
+// 
 
+// 1. MNOISE
 // ChaosGens synth, use selector (mtype), from 0 to 5 to switch UGens, the vib parameter is not really a vib but changes some stuff, can make some great basslines with some params. 
 // can be used as a noise gen on lower freq or bassline. Some combinations don't work well some mtype and low oct for ex, nearly always add some vib
 SynthDef(\mnoise, {
@@ -39,7 +38,8 @@ SynthDef(\mnoise, {
 		
 }).add;
 )
-// IN PROGRESS
+
+// 2. GLITCHCORE
 SynthDef(\glitchcore, {
 	arg bus =0, amp= 0.5, gate=1, dur=1, sawFreq=1, pan=0, freq=440, fmod=0;
 	var sigbase, sigmod, sig, env, env2, bass;
@@ -61,40 +61,6 @@ SynthDef(\glitchcore, {
     ReplaceOut.ar(bus, sig * env);
 }).add;
 
-
-(
-SynthDef(\faim2, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=0, fmod=0, vib=0, rate=1, blur=1, beat_dur=1, vibr=0;
-	var sig;
-	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
-	var env1, env2, env3, env4, env5, env6, env7, env8;
-	sus = sus*blur;
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
-	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
-	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
-	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
-	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
-	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
-	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
-	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vibr) * env1);
-	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
-	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
-	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
-	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
-	sig6 = SinOsc.ar(freq * 2) * env6;
-	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
-	sig = sig /2;
-	sig = sig.flop.sum;
-	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
-	sig = sig * AmpComp.kr(freq);
-	sig = Limiter.ar(sig);
-	sig = sig.tanh;
-	sig = Mix(sig) * 0.1;
-	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
-	ReplaceOut.ar(bus, sig);
-}).add;
-)
 
 (
 SynthDef( "hoover", {
@@ -274,7 +240,7 @@ SynthDef(\osc_table_var, {
 	ReplaceOut.ar(bus, Splay.ar(sig));
 }).add;
 
-SynthDef(\click_base, { |amp = 0.25, freq = 42, bus=0, fmod=0,
+SynthDef(\click, { |amp = 0.25, freq = 42, bus=0, fmod=0,
 	sus = 1, pan = 0|
 	var sig;
 	sig = BLowPass.ar(Impulse.ar(8,0,4), freq*10, 0.1);
@@ -453,6 +419,41 @@ SynthDef(\saw3, {
 	sig = sig*env*amp;
 	ReplaceOut.ar(bus,sig);
 }).add;
+
+
+(
+SynthDef(\faim2, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=0, fmod=0, vib=0, rate=1, blur=1, beat_dur=1, vibr=0;
+	var sig;
+	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
+	var env1, env2, env3, env4, env5, env6, env7, env8;
+	sus = sus*blur;
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
+	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
+	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
+	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
+	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
+	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
+	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
+	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vibr) * env1);
+	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
+	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
+	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
+	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
+	sig6 = SinOsc.ar(freq * 2) * env6;
+	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
+	sig = sig /2;
+	sig = sig.flop.sum;
+	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
+	sig = sig * AmpComp.kr(freq);
+	sig = Limiter.ar(sig);
+	sig = sig.tanh;
+	sig = Mix(sig) * 0.1;
+	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
+	ReplaceOut.ar(bus, sig);
+}).add;
+)
 
 
 SynthDef(\faim, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=200, vib=32;
