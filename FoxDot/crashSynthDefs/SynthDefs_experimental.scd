@@ -295,17 +295,24 @@ SynthDef(\pianovel, { |bus=0, amount=440, detune=0, gate=1, amp=0.5, velocity=12
 )
 
 
-SynthDef(\garfield, { arg bus=0, freq=440, mult=4, amp=1, pan=0,gate=1, rel= 1, dur=1, phase=0, vib=1;
+SynthDef(\garfield, { arg bus=0, freq=440, mult=4, amp=1, pan=0,gate=1, rel= 1, dur=1, phase=0, para1=0.1, vib=1, fmod=0;
 
 	var env =  EnvGen.ar(Env.linen(0.0,dur,0),doneAction:2);
 	var del =  SinOsc.ar(1/8, phase, mult);
 	var sig =  SinOscFB.ar(freq, del, add: SinOsc.ar(vib));
+	
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
 
-	sig = Decimator.ar(sig, 2000);
-	sig = CrossoverDistortion.ar(sig);
-	sig = RLPF.ar(sig, 800);
+	sig = CrossoverDistortion.ar(sig, 0.8, para1);
+	sig = RLPF.ar(sig, 3200, mul:0.1) + sig;
 	sig = CombN.ar(sig, 0.04, 0.085);
 	sig = Splay.ar(sig);
+	
+	sig = Mix(sig) * 1;
+	sig = LeakDC.ar(Limiter.ar(sig, 1));
+	sig = Pan2.ar(sig, pan).tanh;
+	
 	ReplaceOut.ar(bus, (sig * amp) * env);}).add;
 
 
