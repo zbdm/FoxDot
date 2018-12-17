@@ -1,14 +1,61 @@
+(
 // SynthDefs
-// CURRENT LIST 
-// 1. mnoise : a chaosGen based Synth with multiple variations 
-// 2. glitchcore
-// 3. 
 
-// 
+// FreqScope.new(width: 522, height: 300, busNum: 0);
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////// I. NOISE GENERATORS
+// 1. mnoise : a chaosGen based Synth with multiple variations 
+// 2. glitchcore : synth with a noise background, can be chaotic
+// 3. cluster : bouncing drums
+// 4. rsin : noise + higher pitched sound, oscillation, versatile
+// 5. Electric : dark synths with chaotic Ugens
+// 6. radio : radio static / noise texture
+// 7. Drone : u guessed it, some kind of drone/perturbation
+// 8. Table : no description here, try it 
+// 9. The filler, plays fast notes but not only
+// 10. Garfield, don't be scared
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////// II. BASS SYNTHS
+// 1. Faim  : the classic
+// 2. Faim2 : the classic, updated 
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////// III. DRUMS or DRUM-LIKE
+// 1. Click : sounds drum like but try to change fmod to high values and things get craaaazzyyy & vib
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////// IV. PADS
+// 1. Hoover
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////// V. INSTRUMENTS
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// I. NOISE BASED
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 
 // 1. MNOISE
 // ChaosGens synth, use selector (mtype), from 0 to 5 to switch UGens, the vib parameter is not really a vib but changes some stuff, can make some great basslines with some params. 
 // can be used as a noise gen on lower freq or bassline. Some combinations don't work well some mtype and low oct for ex, nearly always add some vib
+
 SynthDef(\mnoise, {
 	arg amp=1, bus=0,mtype=0, freq=40, gate=1, sus=1, fmod=0, blur=1, vib=0, pan=0;
 	var a, osc, env;
@@ -37,9 +84,13 @@ SynthDef(\mnoise, {
 	ReplaceOut.ar(bus, (osc * amp) * env);
 		
 }).add;
-)
+
 
 // 2. GLITCHCORE
+// synth with a noise background, can be chaotic but fun
+// ex : p1 >> glitchcore(5, dur = 4, sawFreq=4, fmod=128, lpf=0, hpf=0)
+
+
 SynthDef(\glitchcore, {
 	arg bus =0, amp= 0.5, gate=1, dur=1, sawFreq=1, pan=0, freq=440, fmod=0;
 	var sigbase, sigmod, sig, env, env2, bass;
@@ -61,8 +112,325 @@ SynthDef(\glitchcore, {
     ReplaceOut.ar(bus, sig * env);
 }).add;
 
+// 3. Cluster 
+// don't recall the source of this synth, but modified to make some kind of bouncing drums
+// warning had a few crashed...gotta fix that
 
-(
+SynthDef(\cluster, {
+	arg para1=4, bus=0, mult=4, gate=1, amp=1, pan=0, freq=440, sus=1, blur=1, fmod=0;
+	var env, snd;
+	
+	
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	freq = [freq, freq+fmod];
+
+	env = EnvGen.ar(Env.adsr(), gate=1, doneAction:2);
+	snd = Splay.ar(
+
+		
+		LeakDC.ar(
+			CombN.ar(
+				SinOsc.ar(1/para1, 
+					Spring.ar(
+						LFPulse.ar(3/4), 
+						4/para1,[[0.5e-1, 1.4e-3]]) * 
+						LFTri.ar(freq, 0, 2pi, mult * pi),
+						mul: 0.5), 4, 1/4, 2))).tanh;
+	
+
+	snd = Mix(snd) * 0.5;
+	snd = Pan2.ar(snd, pan);
+	snd = ReplaceOut.ar(bus, snd * amp);
+
+	
+}).add;
+
+/// 4. RSIN
+//  dark noisy background with some high pitch tones, evolves can do some perc atks
+// examples :
+// b1 >> rsin(oct=2, dur=2, amp=0.5, para1=500, vib=0, fmod=256)
+// b1 >> rsin(oct=3, dur=2, amp=0.5, para1=5000, vib=4, fmod=512)
+
+
+SynthDef(\rsin, {
+	arg amp=1, gate=1, rel=1, dur=1, bus=0, freq=440, para1=2000, pan=0, fmod=0, sus=1, vib=0;
+	var sig1, env, sig,sig2;
+	
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	
+    sig1 = VarSaw;
+	env = EnvGen.ar(Env.adsr(0, 0, 1, dur, 1.2, curve: -3), gate, doneAction:2);
+	sig = FreeVerb2.ar(*XFade2.ar(
+				SinOscFB.ar([60,4],sig1.kr(para1)+1/2),
+	   			 SinOscFB.ar([freq*2,freq],sig1.kr(vib+1)+526/2),sig1.kr(0.1)));
+	sig = sig  * env;
+	sig = Mix(sig) * 1;
+	sig = LeakDC.ar(Limiter.ar(sig, 1));
+	sig = Pan2.ar(sig, pan).tanh;
+	ReplaceOut.ar(bus, (sig * amp));
+}).add;
+
+
+// 5. Electric
+// Dark synth based on chaotic Ugens
+// example : e1 >> electric(oct=3, dur=16, amp=1, blur=2, vib=32).spread()
+
+
+SynthDef(\electric, { 
+	arg bus=0,vib=1, amp=1, sus=1,blur=1, pan=0,gate=1, rel= 1, dur=1, freq=440;
+	var sig, sig2, sig4, sig3, env;
+	
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	sig =  Saw.ar(freq)*9504+ CuspN.ar(freq, 0.1)*0.00001;
+	sig2 = Gendy5.ar(vib).lag/[2.01,3]/99++9;
+	sig4 = LFNoise0.ar(1/2).lag+4/[2.01,3]/99++9;
+	sig3 = sig.tanh;
+	env =  EnvGen.ar(Env.linen(0.3,dur,0),doneAction:2);
+			
+	sig3 = CombN.ar(sig3, 1, (sig2/32) + sig4,9);
+	sig3 = sig3.sum.tanh!2;
+	
+	sig3 = Mix(sig3) * 0.5;
+	sig3 = Pan2.ar(sig3, pan);
+	
+	ReplaceOut.ar(bus, (sig3 * amp) * env);}).add;
+
+
+
+// 6. Radio
+// somekind of radio static/noise/chaotic
+// r1 >> radio(oct=6, dur=2)
+
+
+SynthDef(\radio, { |bus=0, freq=800, gate=1, amp=0.5, dur=0.25, pan=0, sus=1, blur=1|
+	var env, son;
+	
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	env = EnvGen.ar(Env.asr(0,1),gate,doneAction:2);
+	 son = 
+			
+			LFSaw.ar(freq, 0, Gendy4.ar(dur)) + 
+			LFNoise2.ar(freq) + 
+			Gendy5.ar(freq,8,10,32,freq * 4,
+			Gendy5.ar(1, 0, SinOsc.ar(freq)),2, 0.5, 12);
+	
+	son = CombL.ar(son, 0.3, Dust.ar(0.5));
+	son = Mix(son).tanh * 0.2;
+	son = Limiter.ar(son);
+	son = Pan2.ar(son, pan);
+	
+	son = son * env;
+	
+	ReplaceOut.ar(bus,Splay.ar(Pan2.ar(son * amp, pan)));
+	
+}).add;
+
+// 7. DRONE
+// to be used on lower freq
+
+SynthDef(\drone, { arg bus = 0, speed = 1, amp = 0.5, pan=0, sus = 4, dur = 1, freq=200, gate=1, hpf=40, fmod=0, vib=0;
+	var sig;
+	var base_signal = LFNoise1;
+    var adsr = EnvGen.ar(Env.linen(0.1,sus,0.1, 1, -3),gate,doneAction:2);
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	sig =  HPF.ar(
+		FreeVerb2.ar(
+			*XFade2.ar
+			(SinOscFB.ar([freq,freq],base_signal.ar(speed*2)+1),
+			 SinOscFB.ar([freq,freq + fmod],base_signal.ar(speed)+vib),base_signal.ar(120))),hpf);
+
+	sig = LeakDC.ar((sig * 1.1).tanh, 0.999);
+	sig = (sig * adsr) * amp;
+	sig  = Mix(sig) * 0.4;
+	sig = Limiter.ar(sig, 0.99);
+	sig = Pan2.ar(sig * amp, pan);
+	ReplaceOut.ar(bus, sig);
+}).add;
+
+// 8. TABLE 
+// Crazy table
+SynthDef(\table, {
+	arg gate=1, amp=0.5, bus=0, rel=1, pan=0, sus=1, blur=1, freq=440;
+	var sig, env;
+
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	env = EnvGen.ar(Env.adsr(releaseTime: rel), gate, doneAction: 2);
+	sig = {x=0;(80..100).do{|f|f=f/2;x=SinOsc.ar(f+[0,1],x*LFTri.kr(0.4,2).range(1.2,1.6))};x};
+	sig = sig * env;
+	sig = sig * amp;
+
+	sig = Mix(sig) * 0.8;
+	sig = Pan2.ar(sig, pan);
+	
+	ReplaceOut.ar(bus, Splay.ar(sig));
+}).add;
+
+
+// 9. The Filler 
+// plays fast stuff or a drumer depends on the mood, and settings
+// o2 >> thefiller(dur=1, fmod=1)
+// o2 >> thefiller(dur=1, fmod=4, vib=1)
+// o2 >> thefiller(dur=1, fmod=4, vib=16)
+
+
+
+SynthDef(\thefiller, {
+	arg gate=1, amp=0.5, bus=0, rel=1, pan=0,fmod=128, freq=440, blur=1, sus=1, vib=0;
+	var sig, env;
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	env = EnvGen.ar(Env.adsr(releaseTime: rel), gate, doneAction: 2);
+	sig = {	{|i|Ringz.ar(LPF.ar(Impulse.ar(vib+4/(1.2+i)),1e4),1e3/(i+2),fmod+0.1)}
+		.dup(20).scramble.sum.tanh};
+	
+	sig = Notch.ar(sig, 500, 0.8);
+	sig = Notch.ar(sig, 400, 0.8);
+
+	sig = (sig * env) * amp;
+	sig = Mix(sig) * 0.4;
+	sig = Pan2.ar(sig, pan).tanh;
+
+	ReplaceOut.ar(bus, Splay.ar(sig));
+}).add;
+
+
+// 10. Garfield
+// don't be scared
+// a2 >> garfield(oct=2, dur=8, mult=[4, 4, 1, 1, 128, 128], vib=4, fmod=4, para1=0.
+
+SynthDef(\garfield, { arg bus=0, freq=440, mult=4, amp=1, pan=0,gate=1, rel= 1, dur=1, phase=0, para1=0.1, vib=1, fmod=0;
+
+	var env =  EnvGen.ar(Env.linen(0.0,dur,0),doneAction:2);
+	var del =  SinOsc.ar(1/8, phase, mult);
+	var sig =  SinOscFB.ar(freq, del, add: SinOsc.ar(vib));
+	
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+
+	sig = CrossoverDistortion.ar(sig, 0.8, para1);
+	sig = RLPF.ar(sig, 3200, mul:0.1) + sig;
+	sig = CombN.ar(sig, 0.04, 0.085);
+	sig = Splay.ar(sig);
+	
+	sig = Mix(sig) * 1;
+	sig = LeakDC.ar(Limiter.ar(sig, 1));
+	sig = Pan2.ar(sig, pan).tanh;
+	
+	ReplaceOut.ar(bus, (sig * amp) * env);}).add;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// II. BASS SYNTHS
+// 1. FAIM 
+SynthDef(\faim, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=200, vib=32;
+	var sig;
+	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
+	var env1, env2, env3, env4, env5, env6, env7, env8;
+	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
+	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
+	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
+	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
+	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
+	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
+	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
+	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vib) * env1);
+	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
+	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
+	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
+	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
+	sig6 = SinOsc.ar(freq * 2) * env6;
+	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
+	sig = sig /2;
+	sig = sig.flop.sum;
+	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
+	sig = sig * AmpComp.kr(freq);
+	sig = Limiter.ar(sig);
+	sig = sig.tanh;
+	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
+	ReplaceOut.ar(bus, sig);
+}).add;
+
+
+// 2. FAIM2
+SynthDef(\faim2, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=0, fmod=0, vib=0, rate=1, blur=1, beat_dur=1, vibr=0;
+	var sig;
+	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
+	var env1, env2, env3, env4, env5, env6, env7, env8;
+	sus = sus*blur;
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
+	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
+	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
+	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
+	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
+	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
+	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
+	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vibr) * env1);
+	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
+	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
+	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
+	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
+	sig6 = SinOsc.ar(freq * 2) * env6;
+	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
+	sig = sig /2;
+	sig = sig.flop.sum;
+	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
+	sig = sig * AmpComp.kr(freq);
+	sig = Limiter.ar(sig);
+	sig = sig.tanh;
+	sig = Mix(sig) * 0.1;
+	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
+	ReplaceOut.ar(bus, sig);
+}).add;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// III. DRUMS OR DRUM LIKE
+
+// 1.CLICK
+SynthDef(\click, { |amp = 0.25, freq = 42, bus=0, fmod=0,
+	sus = 1, pan = 0|
+	var sig;
+	sig = BLowPass.ar(Impulse.ar(8,0,4), freq*10, 0.1);
+	sig = sig + LFPar.ar(
+		Env.perc(0,0.075).ar.linexp(0,1,freq, 1600) *
+		LFDNoise3.kr(2).exprange(fmod.midiratio, 0.1.midiratio),
+		-1);
+	sig = sig * Env([1,0], [sus], -4).kr(2);
+	sig = Mix(sig) * 1;
+	sig = Pan2.ar(sig, pan);
+	ReplaceOut.ar(bus,Splay.ar( sig * amp ))
+}).add;
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// IV PADS
+
+// 1.Hoover
 SynthDef( "hoover", {
 |amp=0.1, sus=1, pan=0, freq=0, vib=0, fmod=0, rate=0, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.01, rel=0.01, peak=1, level=0.8, legatou =0.1, legatod = 1, gate=1|
 
@@ -98,160 +466,26 @@ osc = Mix(osc) * 0.5;
 osc = Pan2.ar(osc, pan);
 	ReplaceOut.ar(bus, osc*env*amp)}).add;
 
-)
 
 
-SynthDef(\cluster, {
-	arg para1=4, bus=0, mult=4, gate=1, amp=1, pan=0, freq=440, sus=1, blur=1, fmod=0;
-	var env, snd;
-	
-	
-	freq = In.kr(bus, 1);
-	sus = sus * blur;
-	
-	freq = [freq, freq+fmod];
+/////Cool with small dur, low CPU////
+// 2. PROF
 
-	env = EnvGen.ar(Env.adsr(), gate=1, doneAction:2);
-	snd = Splay.ar(
+SynthDef("prof", {
+	arg amp=0.3, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.5, sus=1, rel=0, peak=1, level=0.8, gate = 1, lforate = 10, lfowidth = 0.5, cutoff = 12000, rq = 0.5;
 
-		
-		LeakDC.ar(
-			CombN.ar(
-				SinOsc.ar(1/para1, 
-					Spring.ar(
-						LFPulse.ar(3/4), 
-						4/para1,[[0.5e-1, 1.4e-3]]) * 
-						LFTri.ar(freq, 0, 2pi, mult * pi),
-						mul: 0.5), 4, 1/4, 2))).tanh;
-	
-
-	snd = Mix(snd) * 0.5;
-	snd = Pan2.ar(snd, pan);
-	snd = ReplaceOut.ar(bus, snd * amp);
-
-	
-}).add;
-
-// much better,still quite high proc use
-SynthDef(\rsin, {
-	arg amp=1, gate=1, rel=1, dur=1, bus=0, freq=440, para1=2000, pan=0, fmod=0, sus=1, vib=0;
-	var sig1, env, sig,sig2;
-	
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-	
-    sig1 = VarSaw;
-	env = EnvGen.ar(Env.adsr(0, 0, 1, dur, 1.2, curve: -3), gate, doneAction:2);
-	sig = FreeVerb2.ar(*XFade2.ar(
-				SinOscFB.ar([60,4],sig1.kr(para1)+1/2),
-	   			 SinOscFB.ar([freq*2,freq],sig1.kr(vib+1)+526/2),sig1.kr(0.1)));
-	sig = sig  * env;
-	sig = Mix(sig) * 1;
-	sig = LeakDC.ar(Limiter.ar(sig, 1));
-	sig = Pan2.ar(sig, pan).tanh;
-	ReplaceOut.ar(bus, (sig * amp));
-}).add;
-
-(
-SynthDef(\electric, { 
-	arg bus=0,vib=1, amp=1, sus=1,blur=1, pan=0,gate=1, rel= 1, dur=1, freq=440;
-	var sig, sig2, sig4, sig3, env;
-	
-	freq = In.kr(bus, 1);
-	sus = sus * blur;
-	
-	sig =  Saw.ar(freq)*9504+ CuspN.ar(freq, 0.1)*0.00001;
-	sig2 = Gendy5.ar(vib).lag/[2.01,3]/99++9;
-	sig4 = LFNoise0.ar(1/2).lag+4/[2.01,3]/99++9;
-	sig3 = sig.tanh;
-	env =  EnvGen.ar(Env.linen(0.3,dur,0),doneAction:2);
-			
-	sig3 = CombN.ar(sig3, 1, (sig2/32) + sig4,9);
-	sig3 = sig3.sum.tanh!2;
-	
-	sig3 = Mix(sig3) * 0.5;
-	sig3 = Pan2.ar(sig3, pan);
-	
-	ReplaceOut.ar(bus, (sig3 * amp) * env);}).add;
-
-)
-
-
-SynthDef(\radiostatic, { |bus=0, freq=800, gate=1, amp=0.5, dur=0.25, pan=0|
-	var env = EnvGen.ar(Env.asr(0,1),gate,doneAction:2);
-	var son = LFSaw.ar(freq, 0, Gendy4.ar(dur)) + LFNoise2.ar(freq) + Gendy5.ar(120,2,10,1,freq,Gendy5.ar(15500, 0, 100),0.8 ); 	son = CombN.ar(LPF.ar(FreeVerb.ar(son, 0.5, 0.5), 1600), 0.5);
-	son = son * env;
-	ReplaceOut.ar(bus,Splay.ar(Pan2.ar(son * amp, pan)));
-}).add;
-
-SynthDef(\electricity, {
-	arg amp=0, gate=1, rel=1, dur=8, bus=0, freq=440, para1=2000, comp=1;
-	var sig1, env, sig,sig2;
-	env = EnvGen.ar(Env.adsr(0, 0, 1, rel, 1  ), gate, doneAction:2);
-	sig =  SinOscFB.ar([29,32.7]*2,0.5,2).sqrt.thresh(LFNoise2.ar(12.3)).scaleneg(PinkNoise.ar(0.12)).ring2(Impulse.ar([12.7,10.1]).squared);
-	sig = sig * env;
-	sig = CompanderD.ar(sig,comp/4,1/2,1/2);
-	ReplaceOut.ar(bus, (sig * amp) * env);
-}).add;
-
-SynthDef(\drone, { arg bus = 0, speed = 1, amp = 0.5, pan=0, sus = 4, dur = 1, freq=200, gate=1, hpf=40, fmod=0, vib=0;
-	var sig;
-	var base_signal = LFNoise1;
-    var adsr = EnvGen.ar(Env.linen(0.1,sus,0.1, 1, -3),gate,doneAction:2);
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-	sig =  HPF.ar(
-		FreeVerb2.ar(
-			*XFade2.ar
-			(SinOscFB.ar([freq,freq],base_signal.ar(speed*2)+1),
-			 SinOscFB.ar([freq,freq + fmod],base_signal.ar(speed)+vib),base_signal.ar(120))),hpf);
-
-	sig = LeakDC.ar((sig * 1.1).tanh, 0.999);
-	sig = (sig * adsr) * amp;
-	sig  = Mix(sig) * 0.4;
-	sig = Limiter.ar(sig, 0.99);
-	sig = Pan2.ar(sig * amp, pan);
-	ReplaceOut.ar(bus, sig);
-}).add;
-
-SynthDef(\osc_table, {
-	arg gate=1, amp=0.5, bus=0, rel=1;
-	var sig, env;
-
-	env = EnvGen.ar(Env.adsr(releaseTime: rel), gate, doneAction: 2);
-	sig = {x=0;(80..100).do{|f|f=f/2;x=SinOsc.ar(f+[0,1],x*LFTri.kr(0.4,2).range(1.2,1.6))};x};
-	sig = sig * env;
-	sig = HPF.ar(sig.tanh, 800);
-	sig = sig * amp;
-
-	ReplaceOut.ar(bus, Splay.ar(sig));
-}).add;
-
-SynthDef(\osc_table_var, {
-	arg gate=1, amp=0.5, bus=0, rel=1;
-	var sig, env;
-
-	env = EnvGen.ar(Env.adsr(releaseTime: rel), gate, doneAction: 2);
-	sig = {GVerb.ar({|i|Ringz.ar(LPF.ar(Impulse.ar(2/(1.2+i)),6e3),1e3/(i+1),0.3)}.dup(20).scramble.sum/2,18,5).tanh};
-	sig = HPF.ar(sig, 1600);
-	sig = sig.tanh * env;
-	sig = sig * amp;
-
-	ReplaceOut.ar(bus, Splay.ar(sig));
-}).add;
-
-SynthDef(\click, { |amp = 0.25, freq = 42, bus=0, fmod=0,
-	sus = 1, pan = 0|
-	var sig;
-	sig = BLowPass.ar(Impulse.ar(8,0,4), freq*10, 0.1);
-	sig = sig + LFPar.ar(
-		Env.perc(0,0.075).ar.linexp(0,1,freq, 1600) *
-		LFDNoise3.kr(2).exprange(fmod.midiratio, 0.1.midiratio),
-		-1);
-	sig = sig * Env([1,0], [sus], -4).kr(2);
-	sig = Mix(sig) * 1;
-	sig = Pan2.ar(sig, pan);
-	ReplaceOut.ar(bus,Splay.ar( sig * amp ))
+	var lfo, pulse, filter, env;
+	lfo = LFTri.kr(lforate * [1, 1.01], Rand(0, 2.0) ! 2);
+	pulse = Pulse.ar(freq * [1, 1.01], lfo * lfowidth + 0.5);
+	filter = RLPF.ar(pulse, cutoff, rq);
+	env = EnvGen.ar(
+		envelope: Env.adsr(atk, decay, sus, rel, amp),
+		gate: gate,
+		doneAction: 2);
+	Out.ar(bus, Pan2.ar(
+		in: Mix(filter*amp*0.4) * env,
+		pos: pan)
+	);
 }).add;
 
 
@@ -281,7 +515,9 @@ SynthDef(\pianovel, { |bus=0, amount=440, detune=0, gate=1, amp=0.5, velocity=12
 	ReplaceOut.ar(bus, son * amp);
 }).add;
 
-	SynthDef(\explosion2, {arg bus=0, freq = 200, pan=0.5, amp=0.5;
+
+
+SynthDef(\explosion2, {arg bus=0, freq = 200, pan=0.5, amp=0.5;
 		var ae,sig,finalsig;
 		ae = EnvGen.kr(Env.asr(0, 1, 0.05, 1, 0));
 		sig = Impulse.ar(0);
@@ -291,30 +527,9 @@ SynthDef(\pianovel, { |bus=0, amount=440, detune=0, gate=1, amp=0.5, velocity=12
 		finalsig = amp*ae*sig;
 		DetectSilence.ar(finalsig, doneAction:Done.freeSelf);
 		ReplaceOut.ar(bus, finalsig);
-	}).add;
-
-)
+}).add;
 
 
-SynthDef(\garfield, { arg bus=0, freq=440, mult=4, amp=1, pan=0,gate=1, rel= 1, dur=1, phase=0, para1=0.1, vib=1, fmod=0;
-
-	var env =  EnvGen.ar(Env.linen(0.0,dur,0),doneAction:2);
-	var del =  SinOsc.ar(1/8, phase, mult);
-	var sig =  SinOscFB.ar(freq, del, add: SinOsc.ar(vib));
-	
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-
-	sig = CrossoverDistortion.ar(sig, 0.8, para1);
-	sig = RLPF.ar(sig, 3200, mul:0.1) + sig;
-	sig = CombN.ar(sig, 0.04, 0.085);
-	sig = Splay.ar(sig);
-	
-	sig = Mix(sig) * 1;
-	sig = LeakDC.ar(Limiter.ar(sig, 1));
-	sig = Pan2.ar(sig, pan).tanh;
-	
-	ReplaceOut.ar(bus, (sig * amp) * env);}).add;
 
 
 SynthDef(\ppad, {
@@ -420,138 +635,32 @@ SynthDef(\saw3, {
 	ReplaceOut.ar(bus,sig);
 }).add;
 
+// 
+// SynthDef(\coreNoiz, {
+// 	|amp=1, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.001, decay=0.001, sus=0.55,rel=0.125, peak=1, level=0.8, gate=1, lfofreq = 3, lopfreq = 800, rq = 0.5, detune1 = 12, detune2 = 8|
+// 	
+// 	var env, nvoices1=2, nvoices2=4, osc1, m, lfo, osc2, output;
+// 	
+// 	sus = sus * blur;
+// 	freq = In.kr(bus, 1);
+// 	freq = [freq, freq+fmod];
+// 	
+// 	env = EnvGen.ar(Env.adsr(atk, decay, sus, rel, amp), gate, doneAction:2);
+// 	
+// 	osc1 = {
+// 		m = 2**(detune1/1200).rand2;
+// 		lfo = SinOsc.ar(lfofreq.rand).range(0,1);
+// 		DelayC.ar(LFSaw.ar(m * freq/2), 0.02, freq.reciprocal.rand * lfo);
+// 	}.dup(nvoices1);
+// 	
+// 	osc2 = {
+// 		m = 2**(detune2/1200).rand2;
+// 		lfo = SinOsc.ar(lfofreq.rand).range(0,1);
+// 		DelayC.ar(LFSaw.ar(m * freq), 0.02, freq.reciprocal.rand * lfo);
+// 	}.dup(nvoices2);
+// 	
+// 	output = Pan2.ar(output*amp*env*0.1, pan);
+// 	Out.ar(bus, output);
+// }).add;
 
-(
-SynthDef(\faim2, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=0, fmod=0, vib=0, rate=1, blur=1, beat_dur=1, vibr=0;
-	var sig;
-	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
-	var env1, env2, env3, env4, env5, env6, env7, env8;
-	sus = sus*blur;
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
-	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
-	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
-	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
-	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
-	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
-	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
-	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vibr) * env1);
-	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
-	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
-	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
-	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
-	sig6 = SinOsc.ar(freq * 2) * env6;
-	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
-	sig = sig /2;
-	sig = sig.flop.sum;
-	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
-	sig = sig * AmpComp.kr(freq);
-	sig = Limiter.ar(sig);
-	sig = sig.tanh;
-	sig = Mix(sig) * 0.1;
-	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
-	ReplaceOut.ar(bus, sig);
-}).add;
-)
-
-
-SynthDef(\faim, { arg bus=0, amp=0.1, sus=0.2, gate=1, pan=0, freq=200, vib=32;
-	var sig;
-	var sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8;
-	var env1, env2, env3, env4, env5, env6, env7, env8;
-	freq = freq * ((0..1)/1 - 0.5 * 0.0007 + 1);
-	env1 = EnvGen.kr(Env([0,1,0.051,0],[0.001,0.01,0.8], [4,-8]), 1);
-	env2 = EnvGen.kr(Env([0,1,0.051,0],[0.005,0.5,1.5], [0,-8], releaseNode:2), 1);
-	env3 = EnvGen.kr(Env([0,1,1,0],[0.01,0.01,0.2], [0,0,-4], releaseNode:2), gate);
-	env4 = EnvGen.kr(Env([0,1,0],[0.002,2.8], [0,-4]), 1);
-	env5 = EnvGen.kr(Env([0,1,1,0],[0.001,0.1,0.8], [4,0,-4], releaseNode:2), gate);
-	env6 = EnvGen.kr(Env([0,1,0],[0.001,3.0], [0,-4]), 1);
-	sig1 = SinOsc.ar(freq * 11 + 0) * env1 + (SinOsc.ar(vib) * env1);
-	sig2 = SinOsc.ar(freq * 6 * ( sig1 * 2.5 + 1 )) * env2;
-	sig3 = SinOsc.ar(freq * 2 * 1 + 0) * env3;
-	sig4 = SinOsc.ar(freq * 1 * ( sig3 * 2.5 + 1 ) + 0) * env4;
-	sig5 = SinOsc.ar(freq * 1 * ( sig2 * 2.5 + 1 ) * (sig4 * 2.5 + 1)) * env5;
-	sig6 = SinOsc.ar(freq * 2) * env6;
-	sig = [sig1, sig2, sig3, sig4, sig5, sig6] * DC.ar([0.0, 0.0, 0.0,  0.0, 0.5, 0.5]);
-	sig = sig /2;
-	sig = sig.flop.sum;
-	sig = sig * EnvGen.ar(\adsr.kr( Env.adsr(0.001,0,1,0.01, 1,-1) ),gate,doneAction:2);
-	sig = sig * AmpComp.kr(freq);
-	sig = Limiter.ar(sig);
-	sig = sig.tanh;
-	sig = Pan2.ar(sig, pan + [ 0, 0, 0, 0, 0, 0], amp).sum;
-	ReplaceOut.ar(bus, sig);
-}).add;
-
-
-SynthDef(\dfm, {
-	arg gate=1, amp=0.5, bus=0, rel=1, freq=440, mult=1, multrange=0.1, vib=1;
-	var sig, env;
-
-	env = EnvGen.ar(Env.adsr(releaseTime: rel), gate, doneAction: 2);
-	sig = Saw.ar(freq);
-
-	sig = DFM1.ar(VarSaw.ar([freq,freq*[1.01, 4.01]]*mult,0.0,multrange),(freq*2)*mult,VarSaw.kr(vib).range(multrange,1.1),1,0,0.001,0.5);
-
-	sig = DelayN.ar(sig, 0.048, 0.048);
-	sig = AllpassN.ar(sig, 0.050, [Rand(0, 0.05), Rand(0,0.05)], 1)!2;
-	sig = sig / 2.5;
-	sig = sig * env;
-	sig = sig * amp;
-
-	ReplaceOut.ar(bus, Splay.ar(sig));
-}).add;
-
-//////////Zbdm Synth//////////
-
-/////!! Small dur = Server(40%) !!///////
-(
-SynthDef(\coreNoiz, {
-	|amp=1, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.001, decay=0.001, sus=0.55,rel=0.125, peak=1, level=0.8, gate=1, lfofreq = 3, lopfreq = 800, rq = 0.5, detune1 = 12, detune2 = 8|
-
-	var env, nvoices1=2, nvoices2=4, osc1, m, lfo, osc2, output;
-
-	sus = sus * blur;
-	freq = In.kr(bus, 1);
-	freq = [freq, freq+fmod];
-
-	env = EnvGen.ar(Env.adsr(atk, decay, sus, rel, amp), gate, doneAction:2);
-
-	osc1 = {
-		 m = 2**(detune1/1200).rand2;
-		 lfo = SinOsc.ar(lfofreq.rand).range(0,1);
-		DelayC.ar(LFSaw.ar(m * freq/2), 0.02, freq.reciprocal.rand * lfo);
-	}.dup(nvoices1);
-
-	osc2 = {
-		 m = 2**(detune2/1200).rand2;
-		 lfo = SinOsc.ar(lfofreq.rand).range(0,1);
-		DelayC.ar(LFSaw.ar(m * freq), 0.02, freq.reciprocal.rand * lfo);
-	}.dup(nvoices2);
-
-	output = Pan2.ar(output*amp*env*0.1, pan);
-	Out.ar(bus, output);
-}).add;
-)
-
-
-/////Cool with small dur, low CPU////
-(
-SynthDef("profenstring", {
-	arg amp=0.3, pan=0, freq=0, vib=0, fmod=0, rate=8, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.5, sus=1, rel=0, peak=1, level=0.8, gate = 1, lforate = 10, lfowidth = 0.5, cutoff = 12000, rq = 0.5;
-
-	var lfo, pulse, filter, env;
-	lfo = LFTri.kr(lforate * [1, 1.01], Rand(0, 2.0) ! 2);
-	pulse = Pulse.ar(freq * [1, 1.01], lfo * lfowidth + 0.5);
-	filter = RLPF.ar(pulse, cutoff, rq);
-	env = EnvGen.ar(
-		envelope: Env.adsr(atk, decay, sus, rel, amp),
-		gate: gate,
-		doneAction: 2);
-	Out.ar(bus, Pan2.ar(
-		in: Mix(filter*amp*0.4) * env,
-		pos: pan)
-	);
-}).add;
 )
