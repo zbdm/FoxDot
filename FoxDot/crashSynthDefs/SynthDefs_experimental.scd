@@ -146,17 +146,24 @@ SynthDef(\cluster, {
 
 }).add;
 
-
+// much better,still quite high proc use
 SynthDef(\rsin, {
-	arg amp=0, gate=1, rel=1, dur=1, bus=0, freq=440, para1=2000;
+	arg amp=1, gate=1, rel=1, dur=1, bus=0, freq=440, para1=2000, pan=0, fmod=0, sus=1, vib=0;
 	var sig1, env, sig,sig2;
+	
+	freq = In.kr(bus, 1);
+	freq = [freq, freq+fmod];
+	
     sig1 = VarSaw;
-	env = EnvGen.ar(Env.adsr(0, 0, 1, 16, 1.2  ), gate, doneAction:2);
-	sig = FreeVerb2.ar(*XFade2.ar(SinOscFB.ar([60,4],sig1.kr(para1)+1/2),SinOscFB.ar([freq*2,freq],sig1.kr(3.5252)+526/2),sig1.kr(0.1)));
+	env = EnvGen.ar(Env.adsr(0, 0, 1, dur, 1.2, curve: -3), gate, doneAction:2);
+	sig = FreeVerb2.ar(*XFade2.ar(
+				SinOscFB.ar([60,4],sig1.kr(para1)+1/2),
+	   			 SinOscFB.ar([freq*2,freq],sig1.kr(vib+1)+526/2),sig1.kr(0.1)));
 	sig = sig  * env;
-	sig2 = LPF.ar(sig, 1000);
-	sig = sig + sig2;
-	ReplaceOut.ar(bus, (sig * amp) * env);
+	sig = Mix(sig) * 1;
+	sig = LeakDC.ar(Limiter.ar(sig, 1));
+	sig = Pan2.ar(sig, pan).tanh;
+	ReplaceOut.ar(bus, (sig * amp));
 }).add;
 
 SynthDef(\electric, { arg bus=0,vib=1, destroy=4, mult=9999, amp=0.1, pan=0,gate=1, rel= 1, saw=12, dur=1;
