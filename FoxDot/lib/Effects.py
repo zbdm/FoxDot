@@ -254,13 +254,13 @@ fx = FxList.new("vib", "vibrato", {"vib": 0, "vibdepth": 0.02}, order=0)
 fx.add("osc = Vibrato.ar(osc, vib, depth: vibdepth)")
 fx.save()
 
-fx = FxList.new("slide", "slideTo", {"slide":0, "sus":1, "slidedelay": 0}, order = 0)
-fx.add("osc = osc * EnvGen.ar(Env([1, 1, slide + 1], [sus*slidedelay, sus*(1-slidedelay)]))")
+# Legato slide
+fx = FxList.new("leg", "leg", {"leg":0, "sus":1 }, order = 0)
+fx.add("osc = osc * XLine.ar(Rand(0.5,1.5)*leg,1,0.05*sus)")
 fx.save()
 
-# Legato slide # WIP 
-fx = FxList.new("leg", "leg", {"leg":0, "sus":1 }, order = 0)
-fx.add("osc = osc * XLine.ar(Rand(0.5,1.5)*leg,1,0.02*sus)")
+fx = FxList.new("slide", "slideTo", {"slide":0, "sus":1, "slidedelay": 0}, order = 0)
+fx.add("osc = osc * EnvGen.ar(Env([1, 1, slide + 1], [sus*slidedelay, sus*(1-slidedelay)]))")
 fx.save()
 
 fx = FxList.new("slidefrom", "slideFrom", {"slidefrom": 0, "sus": 1, "slidedelay": 0}, order=0)
@@ -332,6 +332,11 @@ if SC3_PLUGINS:
     fx.add("osc = osc + (0.1 * dist * DynKlank.ar(`[[60,61,240,3000 + SinOsc.ar(62,mul:100)],nil,[0.1, 0.1, 0.05, 0.01]], osc))")
     fx.add("osc = (osc.cubed * 8).softclip * 0.5")
     fx.add("osc = SelectX.ar(dist, [tmp, osc])")
+    fx.save()
+
+    #Dist mod
+    fx = FxList.new('disto', 'disto_mod', {'disto': 0, 'smooth': 0.3, 'distomix': 1}, order=1)
+    fx.add("osc = LinXFade2.ar(CrossoverDistortion.ar(osc, amp:0.5*disto, smooth:smooth),  osc, 1-distomix)")
     fx.save()
 
 # Envelope -- just include in the SynthDef and use asdr?
