@@ -33,7 +33,7 @@ ServerInfo = namedtuple(
     ('sample_rate', 'actual_sample_rate', 'num_synths', 'num_groups',
      'num_audio_bus_channels', 'num_control_bus_channels',
      'num_input_bus_channels', 'num_output_bus_channels', 'num_buffers',
-     'max_nodes', 'max_synth_defs'))
+     'max_nodes', 'max_synth_defs', 'peak_cpu', 'avg_cpu'))
 
 
 class OSCClientWrapper(OSCClient):
