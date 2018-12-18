@@ -13,6 +13,8 @@ OSCFunc(
         Server.default.options.numBuffers,
         Server.default.options.maxNodes,
         Server.default.options.maxSynthDefs,
+        Server.default.peakCPU,
+        Server.default.avgCPU,       
     );
     }, '/foxdot/info'
 );
