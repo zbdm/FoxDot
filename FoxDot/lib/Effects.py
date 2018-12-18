@@ -254,6 +254,11 @@ fx = FxList.new("vib", "vibrato", {"vib": 0, "vibdepth": 0.02}, order=0)
 fx.add("osc = Vibrato.ar(osc, vib, depth: vibdepth)")
 fx.save()
 
+# Legato slide
+fx = FxList.new("leg", "leg", {"leg":0, "sus":1 }, order = 0)
+fx.add("osc = osc * XLine.ar(Rand(0.5,1.5)*leg,1,0.05*sus)")
+fx.save()
+
 fx = FxList.new("slide", "slideTo", {"slide":0, "sus":1, "slidedelay": 0}, order = 0)
 fx.add("osc = osc * EnvGen.ar(Env([1, 1, slide + 1], [sus*slidedelay, sus*(1-slidedelay)]))")
 fx.save()
@@ -278,17 +283,17 @@ fx = FxList.new("pshift", "pitchShift", {"pshift":0}, order=0)
 fx.add("osc = osc * (1.059463**pshift)")
 fx.save()
 
-# fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
-# fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
-# fx.save()
+fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
+fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
+fx.save()
 
-# fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
-# fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
-# fx.save()
+fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
+fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
+fx.save()
 
-# fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
-# fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
-# fx.save()
+fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
+fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
+fx.save()
 
 # Signal effects
 
@@ -329,13 +334,25 @@ if SC3_PLUGINS:
     fx.add("osc = SelectX.ar(dist, [tmp, osc])")
     fx.save()
 
+    #Dist mod
+    fx = FxList.new('disto', 'disto_mod', {'disto': 0, 'smooth': 0.3, 'distomix': 1}, order=1)
+    fx.add("osc = LinXFade2.ar(CrossoverDistortion.ar(osc, amp:0.5*disto, smooth:smooth),  osc, 1-distomix)")
+    fx.save()
+
 # Envelope -- just include in the SynthDef and use asdr?
 
 # Post envelope effects
 
-fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
-fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+#New Chop, with wave select :
+#chopwave = (0: Pulse, 1: Tri, 2: Saw, 3: Sin, 4: Parabolic )
+# and chopi = oscillator phase
+fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1, 'chopwave': 0, 'chopi': 0}, order=2)
+fx.add("osc = LinXFade2.ar(osc * SelectX.kr(chopwave, [LFPulse.kr(chop / sus, iphase:chopi, add: 0.01), LFTri.kr(chop / sus, iphase:chopi, add: 0.01), LFSaw.kr(chop / sus, iphase:chopi, add: 0.01), FSinOsc.kr(chop / sus, iphase:chopi, add: 0.01), LFPar.kr(chop / sus, iphase:chopi, add: 0.01)]), osc, 1-chopmix)")
 fx.save()
+
+#fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1, 'chopmix': 1}, order=2)
+#fx.add("osc = LinXFade2.ar(osc * LFPulse.kr(chop / sus, add: 0.01), osc, 1-chopmix)")
+#fx.save()
 
 fx = FxList.new('tremolo', 'tremolo', {'tremolo': 0, 'beat_dur': 1, 'tremolomix': 1}, order=2)
 fx.add("osc = LinXFade2.ar(osc * SinOsc.ar( tremolo / beat_dur, mul:0.5, add:0.5), osc, 1-tremolomix)")
