@@ -258,6 +258,11 @@ fx = FxList.new("slide", "slideTo", {"slide":0, "sus":1, "slidedelay": 0}, order
 fx.add("osc = osc * EnvGen.ar(Env([1, 1, slide + 1], [sus*slidedelay, sus*(1-slidedelay)]))")
 fx.save()
 
+# Legato slide # WIP 
+fx = FxList.new("leg", "leg", {"leg":0, "sus":1 }, order = 0)
+fx.add("osc = osc * XLine.ar(Rand(0.5,1.5)*leg,1,0.02*sus)")
+fx.save()
+
 fx = FxList.new("slidefrom", "slideFrom", {"slidefrom": 0, "sus": 1, "slidedelay": 0}, order=0)
 fx.add("osc = osc * EnvGen.ar(Env([slidefrom + 1, slidefrom + 1, 1], [sus*slidedelay, sus*(1-slidedelay)]))")
 fx.save()
@@ -278,17 +283,17 @@ fx = FxList.new("pshift", "pitchShift", {"pshift":0}, order=0)
 fx.add("osc = osc * (1.059463**pshift)")
 fx.save()
 
-# fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
-# fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
-# fx.save()
+fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
+fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
+fx.save()
 
-# fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
-# fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
-# fx.save()
+fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
+fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
+fx.save()
 
-# fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
-# fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
-# fx.save()
+fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
+fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
+fx.save()
 
 # Signal effects
 
