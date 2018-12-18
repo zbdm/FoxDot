@@ -25,6 +25,7 @@
 ////////////// IV. PADS
 // 1. Hoover
 // 2. total : an evolving soundscape
+// 3. SynthWave : mysterious 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////// V. INSTRUMENTS
@@ -470,6 +471,35 @@ SynthDef(\totalsin, {arg bus = 0, amp = 0.5, freq = 220, rel = 0.2, sus=1, hpf =
 }).add;
 )
 
+// 3. SynthWave
+SynthDef(\synthWave, {
+	arg bus=0, amp=0.5, freq=220,dur=1,vib=1, index=8,rel=8, blur=1, sus=1, pan=0, fmod=0;
+	var env, sig, sig2;
+
+		
+	freq = In.kr(bus, 1);
+	sus = sus * blur;
+	
+	freq = [freq, freq+fmod];
+	
+	env=EnvGen.ar(Env(curve: 'lin',times: (sus * 2),levels: [0, amp, 0]), doneAction: 0);
+
+	sig =  SinOsc.ar(freq * 1, 0, freq * index * LFNoise1.kr(10.reciprocal).abs);
+	sig2 = SinOsc.ar((freq * vib) + sig, 0, 1);
+
+	sig = DelayN.ar(sig2, 0.048, 0.048);
+	sig = Mix.arFill(5, { CombN.ar(sig, 0.1, LFNoise1.ar(Rand(0, 0.1), 0.001, 0.05), dur) });
+	sig = AllpassN.ar(sig, 0.050, [Rand(0, 0.05), Rand(0,0.05)], 1)!3;
+	sig = Mix(sig) * 0.5;
+	sig = LPF.ar(sig, 20000);
+	sig = LPF.ar(sig, 15000);
+	sig = HPF.ar(sig,20);
+	sig = Pan2.ar(sig, pan);
+	ReplaceOut.ar(bus, (sig * env) * amp);
+
+}).add;
+
+
 
 /////Cool with small dur, low CPU////
 // 2. PROF
@@ -492,24 +522,6 @@ SynthDef("prof", {
 }).add;
 
 
-SynthDef(\totalsin, {arg bus = 0, amp = 0.5, freq = 220, rel = 0.2, gate=1, hpf = 6000, pan = 0, slicer=0, totalmix1=1, totalmix2=1;
-
-	var sig , sig1, sig2, sig3, env;
-    sig1 = SinOscFB;
-	sig2 = GVerb.ar(mean(FreqShift.ar(c=sig1.ar(sig1.ar(sig1.ar(800/b=(1..9),1),1/b)+b*[24, 99, 140],1),1/b)+c)/3,200,64,0.5,0.5,9,1,0.7,1);
-	sig = sig2 ;
-	sig = sig * LinSelectX.kr(slicer,[1, SinOsc.ar(4, 0, 1)]);
-	sig = LinXFade2.ar(PitchShift.ar(sig, 0.02, Line.kr(0.1,4,20), 0, 0.0001), sig, totalmix1);
-		sig = LinXFade2.ar(PitchShift.ar(sig, 0.02, Line.kr(0.1,1,1), 0, 0.0001), sig, totalmix2);
-
-	env = EnvGen.ar(Env.adsr(1, releaseTime: 64), gate, doneAction:2);
-	// sig = GVerb.ar(sig,80,4)/8+sig;
-	sig = CompanderD.ar(sig,8/4,1/3,1/10);
-	// sig = Limiter.ar(sig);
-	sig = sig * env;
-	sig = sig * amp;
-	ReplaceOut.ar(bus, Pan2.ar(sig, pan));
-}).add;
 
 
 SynthDef(\pianovel, { |bus=0, amount=440, detune=0, gate=1, amp=0.5, velocity=127, hard=0.8, velhard=0.8|
@@ -593,29 +605,6 @@ inf)])),
 
         ReplaceOut.ar(bus, sig);
 }).add;
-
-
-SynthDef(\synthWave, {
-	arg bus=0, amp=0.5, freq=220, modpartial=1, carPartial=0.5, index=4, mul= 0.1, delMul=0.04, gate=1,rel=8;
-	var env, sig, sig2;
-
-	env = EnvGen.ar(Env.adsr(rel, rel, releaseTime:rel, ),gate, doneAction: 2);
-
-	sig =  SinOsc.ar(freq * 1, 0, freq * index * LFNoise1.kr(10.reciprocal).abs);
-	sig2 = SinOsc.ar((freq * carPartial) + sig, 0, mul);
-
-	sig = DelayN.ar(sig2, 0.048, 0.048);
-	sig = Mix.arFill(5, { CombN.ar(sig, 0.1, LFNoise1.ar(Rand(0, 0.1), delMul, 0.05), 15) });
-	sig = AllpassN.ar(sig, 0.050, [Rand(0, 0.05), Rand(0,0.05)], 1)!4;
-	sig = LPF.ar(sig, 1200) + sig/8;
-	sig = HPF.ar(sig, 50);
-	sig = Limiter.ar(sig);
-
-
-	ReplaceOut.ar(bus, (sig * env) * amp);
-
-}).add;
-
 
 
 SynthDef(\saw3, {
