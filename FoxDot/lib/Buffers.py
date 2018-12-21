@@ -463,4 +463,4 @@ class GranularSynthDef(SampleSynthDef):
 
 stretch = BeatStretchSynthDef()
 loop = LoopSynthDef()
-gsynth = GranularSynthDef()
+#gsynth = GranularSynthDef()
