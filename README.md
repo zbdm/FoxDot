@@ -7,15 +7,17 @@ CRASH SERVER EDITS
 18.12.2018
 ### added Legato and Disto:
 ```python
-a1 >> blip(leg=0.5, disto=0.5, smooth=[0.3,1])
+a1 >> blip([0,4,-2,2], dur=1/2, leg=[0,2], disto=1, smooth=0.8, distomix=0.5)
 ```
+
+
 
 16.12.2018
 ### Mod the Chop FX
 with chopwave you can choose different wave: [0:Pulse, 1:Tri, 2:Saw, 3:Sine, 4:Parabol] 
 with chopi=[0..1] you adjust the phase
 ```python
-a1 >> ambi(dur=8, chop=4, chopwave=PRand(5), chopi=PWhite(0,1), chopmix=0.5)
+a3 >> pasha(dur=2, sus=4, chop=4, chopwave=PRand(5), chopi=PWhite(0,1), chopmix=0.7) + (0,2,4)
 ```
 
 
@@ -23,8 +25,8 @@ a1 >> ambi(dur=8, chop=4, chopwave=PRand(5), chopi=PWhite(0,1), chopmix=0.5)
 ### Add Faim (good bass), Prof(Prophet like), Pianovel(piano with velocity) SynthDefs
 ```python
 f1 >> faim(dur=1/2, oct=3, sus=f1.dur*0.5, vibr=[0,3])
-p1 >> prof(dur=1/2, oct=(5,6), lforate=[2,4,8], lfowidth=PWhite(0.1,1), cutoff=4500, rq=0.4)
-i1 >> pianovel(Prand(8), dur=1/2, velocity=PRand(80,127), hard=[0.4,4], velhard=[0.2,3])
+p1 >> prof(dur=1/2, oct=(5,6), lforate=[2,4,8], lfowidth=PWhite(0.1,1), cutoff=3500, rq=0.4)
+i1 >> pianovel(PRand(8), dur=1/2, velocity=PRand(80,127), hard=[0.4,0.7], velhard=[0.2,3])
 ```
 
 
@@ -34,15 +36,15 @@ i1 >> pianovel(Prand(8), dur=1/2, velocity=PRand(80,127), hard=[0.4,4], velhard=
 02.12.2018
 ### Add Flanger & Octafuz FX
 ```python
-a1 >> blip(dur=8, flanger=4, fdecay=0.5, flangermix=0.5)
-a2 >> blip(dur=1/2, octafuz=2, octamix=0.7)
+a1 >> blip(dur=1, flanger=linvar([0,15],24), fdecay=14, flangermix=0.5).spread()
+a2 >> blip(dur=1/2, octafuz=0.2, octamix=0.7)
 ```
 
 01.12.2018
 ### Add Jpverb FX
 !!! High CPU, need more tweak, jpverb=reverb time(0.1..60), damp=damping HF (0..5)
 ```python
-a1 >> blip(dur=8, jpverb=2, damp=0.9, jpverbmix=0.5)
+a1 >> blip(PRand(8), dur=2, jpverb=4, damp=0.19, jpverbmix=0.75)
 ```
 
 29.11.2018
