@@ -397,20 +397,23 @@ space.add()
 keys = FileSynthDef("keys")
 keys.add()
 
-dbass = FileSynthDef("dbass") 
+dbass = FileSynthDef("dbass")
 dbass.add()
 
-sinepad = FileSynthDef("sinepad") 
+sinepad = FileSynthDef("sinepad")
 sinepad.add()
 
-pianovel = FileSynthDef("pianovel") 
+pianovel = FileSynthDef("pianovel")
 pianovel.add()
 
-faim = FileSynthDef("faim") 
+faim = FileSynthDef("faim")
 faim.add()
 
-prof = FileSynthDef("prof") 
+prof = FileSynthDef("prof")
 prof.add()
+
+video = FileSynthDef("video")
+video.add()
 
 # Get rid of the variable synth
 
