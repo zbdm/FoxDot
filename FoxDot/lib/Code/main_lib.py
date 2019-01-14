@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import sys
 import re
+import os.path
 from traceback import format_exc as error_stack
 from types import CodeType, FunctionType
 
@@ -74,6 +75,25 @@ else:
         """ Removes non-ascii characters from a string """
         string = string.replace(u"\u03BB", "lambda")
         return string.encode("ascii", "replace")
+
+class _StartupFile:
+    def __init__(self, path):
+        self.set_path(path)
+    def set_path(self, path):
+        self.path = path if path  is None else os.path.realpath(path)
+
+    def load(self):
+        if self.path is not None:
+            try:
+                file = open(self.path)
+                code = file.read()
+                file.close()
+                return code
+            except FileNotFoundError:
+                WarningMsg("'{}' startup file not found.".format(self.path))
+        return ""
+
+FOXDOT_STARTUP = _StartupFile(FOXDOT_STARTUP_PATH)
         
 class FoxDotCode:
     namespace={}
@@ -89,6 +109,19 @@ class FoxDotCode:
         ''' Forces FoxDot to look in `directory` instead of the default 
             directory when using audio samples. '''
         return cls.namespace['symbolToDir'].set_root( directory )
+
+    @classmethod
+    def use_startup_file(cls, path):
+        return cls.namespace['FOXDOT_STARTUP'].set_path(path)
+
+    @classmethod
+    def no_startup(cls):
+        return cls.namespace["FOXDOT_STARTUP"].set_path(None)
+
+    def load_startup_file(self): 
+        """ Must be initialised first """
+        code = self.namespace["FOXDOT_STARTUP"].load()
+        return self.__call__(code, verbose=False)
                  
     def __call__(self, code, verbose=True, verbose_error=None):
         """ Takes a string of FoxDot code and executes as Python """
@@ -164,7 +197,7 @@ class FoxDotCode:
                 
         return
 
-execute = FoxDotCode()
+execute = FoxDotCode() # this is not well named
 
 def get_now(obj):
     """ Returns the value of objects if they are time-varying """
@@ -184,6 +217,8 @@ def get_input():
 def handle_stdin():
     """ When FoxDot is run with the --pipe added, this function
         is called and continuosly   """
+
+    load_startup_file()
 
     while True:
 
@@ -207,6 +242,9 @@ def stdout(code):
 def debug_stdout(*args):
     """ Forces prints to server-side """
     sys.__stdout__.write(" ".join([str(s) for s in args]) + "\n")
+
+def load_startup_file():
+    return execute.load_startup_file()
 
 def WarningMsg(*text):
     print("Warning: {}".format( " ".join(str(s) for s in text) ))

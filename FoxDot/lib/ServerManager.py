@@ -852,10 +852,14 @@ class TempoServer(ThreadedServer):
         self.server_thread.start()
         return
 
-    def update_tempo(self, bpm):
+    def update_tempo(self, source, bpm, bpm_start_beat, bpm_start_time):
         """ Sends information  to all connected peers about changing tempo """
         for peer in self.peers:
-            peer.update_tempo(bpm)
+            if peer is not source:
+                peer.update_tempo(bpm, bpm_start_beat, bpm_start_time)
+        # Update the master clock tempo if receiving from another peer
+        if source is not None:
+            self.metro.update_tempo_from_connection(bpm, bpm_start_beat, bpm_start_time)
         return
 
     def kill(self):
@@ -909,21 +913,31 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
                     send_to_socket(self.request, self.metro.get_sync_info())
 
+                # Tell server to update tempo and update clients
+
                 elif "new_bpm" in data:
 
-                    self.metro.update_tempo(data["new_bpm"])
+                    self.master.update_tempo(self, **data["new_bpm"])
 
                 elif "latency":
 
                     send_to_socket(self.request, ["latency"])
 
-            
         return
 
 
-    def update_tempo(self, bpm):
+    def update_tempo(self, bpm, bpm_start_beat, bpm_start_time):
 
-        send_to_socket(self.request, {"new_bpm": bpm })
+        data = {
+            "new_bpm" :
+                {
+                    "bpm" : bpm,
+                    "bpm_start_time" : bpm_start_time,
+                    "bpm_start_beat" : bpm_start_beat
+            }
+        }
+
+        send_to_socket(self.request, data)
 
         return
 
@@ -932,7 +946,7 @@ class TempoClient:
     def __init__(self, clock):
         self.metro = clock
 
-        self.sync_keys = ("start_time", "bpm", "beat", "time") # ,"seed")
+        self.sync_keys = ("bpm_start_beat", "bpm_start_time", "bpm")
 
         self.server_hostname = None
         self.server_port     = None
@@ -1040,11 +1054,20 @@ class TempoClient:
             
             elif "new_bpm" in data:
 
-                self.metro.update_tempo(data["new_bpm"])
+                self.metro.update_tempo_from_connection(**data["new_bpm"])
         return
 
-    def update_tempo(self, bpm):
-        send_to_socket(self.socket, {"new_bpm": bpm})
+    def update_tempo(self, bpm, bpm_start_beat, bpm_start_time):
+        """ Sends data to other connected FoxDot instances to update their tempo """
+        data = {
+            "new_bpm" :
+                {
+                    "bpm" : bpm,
+                    "bpm_start_time" : bpm_start_time,
+                    "bpm_start_beat" : bpm_start_beat
+            }
+        }
+        return self.send(data)
 
     def kill(self):
         """ Properly terminates the connection to the server """
