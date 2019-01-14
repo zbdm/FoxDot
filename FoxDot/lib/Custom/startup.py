@@ -6,13 +6,14 @@ import sys
 ## Path Snd
 FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd/")
 FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
+FoxDotCode.use_sample_directory(FOXDOT_SND)
 
-### Effects 
+### Effects
 #Dist mod
 #    fx = FxList.new('disto', 'disto_mod', {'disto': 0, 'smooth': 0.3, 'distomix': 1}, order=1)
 #    fx.add("osc = LinXFade2.ar(CrossoverDistortion.ar(osc, amp:0.5*disto, smooth:smooth),  osc, 1-distomix)")
 #    fx.save()
-    
+
 #New Chop, with wave select :
 #chopwave = (0: Pulse, 1: Tri, 2: Saw, 3: Sin, 4: Parabolic )
 # and chopi = oscillator phase

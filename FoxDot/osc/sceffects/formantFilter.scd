@@ -1,5 +1,5 @@
 SynthDef.new(\formantFilter,
-{|bus, formant, formantmix=1|
+{|bus, formant, formantmix|
 var osc;
 osc = In.ar(bus, 2);
 formant = (formant % 8) + 1;

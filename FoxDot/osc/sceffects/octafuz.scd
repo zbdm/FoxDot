@@ -1,4 +1,3 @@
-
 SynthDef.new(\octafuz,
 {|bus, octafuz, octamix|
 var osc;
