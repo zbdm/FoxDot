@@ -310,6 +310,10 @@ fx = FxList.new('lpf','lowPassFilter', {'lpf': 0, 'lpr': 1}, order=2)
 fx.add('osc = RLPF.ar(osc, lpf, lpr)')
 fx.save()
 
+fx = FxList.new('npf','Notch', {'npf': 0, 'npr': 1}, order=2)
+fx.add('osc = Notch.ar(osc, npf, npr)')
+fx.save()
+
 fx = FxList.new('swell','filterSwell', {'swell': 0, 'sus': 1, 'hpr': 1}, order=2)
 fx.add_var("env")
 fx.add("env = EnvGen.kr(Env([0,1,0], times:[(sus*0.25), (sus*0.25)], curve:\\sin))")
