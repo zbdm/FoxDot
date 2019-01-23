@@ -1,5 +1,4 @@
-
-SynthDef.new(\notch,
+SynthDef.new(\Notch,
 {|bus, npf, npr|
 var osc;
 osc = In.ar(bus, 2);

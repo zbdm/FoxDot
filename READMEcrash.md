@@ -1,9 +1,21 @@
 
-FoxDot Crash Server Edition - Live Coding with Python v0.7
+FoxDot Crash Server Edition - Live Coding with Python v0.7.19
 =====================================
 
 CRASH SERVER EDITS
 =====================================
+
+23/01/2019 Synth Tweaking
+### tweak Faim, add ADSR enveloppe: reduce CPU, Lowshelf: less boomy
+```python
+f1 >> faim(var([0,1,[3,-3]],[8,6,2]), dur=PDur(8,8), oct=(PStep(16,6,3),P[2:6]), lpf=2900, drive=0.7)
+```
+### Add Varicelle synth in experimental
+### Add Square Synth, like a pulse but with phase
+### Add Supersaw Synth with phase
+### Add Phase to [dirt, square, supersaw, dbass]
+
+
 18.12.2018
 ### added Legato and Disto:
 ```python
@@ -14,7 +26,7 @@ a1 >> blip([0,4,-2,2], dur=1/2, leg=[0,2], disto=1, smooth=0.8, distomix=0.5)
 
 16.12.2018
 ### Mod the Chop FX
-with chopwave you can choose different wave: [0:Pulse, 1:Tri, 2:Saw, 3:Sine, 4:Parabol] 
+with chopwave you can choose different wave: [0:Pulse, 1:Tri, 2:Saw, 3:Sine, 4:Parabol]
 with chopi=[0..1] you adjust the phase
 ```python
 a3 >> pasha(dur=2, sus=4, chop=4, chopwave=PRand(5), chopi=PWhite(0,1), chopmix=0.7) + (0,2,4)
@@ -31,7 +43,7 @@ i1 >> pianovel(PRand(8), dur=1/2, velocity=PRand(80,127), hard=[0.4,0.7], velhar
 
 
 04.12.2018
-### Update Samples 
+### Update Samples
 
 02.12.2018
 ### Add Flanger & Octafuz FX
@@ -60,13 +72,6 @@ b6 >> klank(sus=4, oct=(3, 4), echo=0.5, echomix=0)
 
 
 
-
-
-
-
-
-
-
 ## Thanks
 
 - The SuperCollider development community and, of course, James McCartney, its original developer
@@ -77,7 +82,7 @@ b6 >> klank(sus=4, oct=(3, 4), echo=0.5, echomix=0)
 
 ### Samples
 
-FoxDot's audio files have been obtained from a number of sources but I've lost record of which files are attributed to which original author. Here's a list of thanks for the unknowing creators of FoxDot's sample archive. 
+FoxDot's audio files have been obtained from a number of sources but I've lost record of which files are attributed to which original author. Here's a list of thanks for the unknowing creators of FoxDot's sample archive.
 
 - [Legowelt Sample Kits](https://awolfe.home.xs4all.nl/samples.html)
 - [Game Boy Drum Kit](http://bedroomproducersblog.com/2015/04/08/game-boy-drum-kit/)
