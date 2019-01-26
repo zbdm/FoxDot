@@ -13,6 +13,9 @@ my_client = OSCClient()
 my_client.connect((localhost, 12345)) # Video OSC Ip:port
 DefaultServer.forward = my_client
 
+#Video Synth
+video = FileSynthDef("video")
+video.add()
 
 ### Effects
 #Dist mod
