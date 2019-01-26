@@ -8,6 +8,12 @@ FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd/")
 FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
 FoxDotCode.use_sample_directory(FOXDOT_SND)
 
+#OSC VIDEO FORWARD
+my_client = OSCClient() 
+my_client.connect((localhost, 12345)) # Video OSC Ip:port
+DefaultServer.forward = my_client
+
+
 ### Effects
 #Dist mod
 #    fx = FxList.new('disto', 'disto_mod', {'disto': 0, 'smooth': 0.3, 'distomix': 1}, order=1)
