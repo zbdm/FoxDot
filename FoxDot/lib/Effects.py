@@ -403,6 +403,15 @@ fx = FxList.new("drive", "overdriveDistortion", {"drive":0, "drivemix":1}, order
 fx.add("osc = LinXFade2.ar((osc * (drive * 50)).clip(0,0.2).fold2(2), osc, 1-drivemix)")
 fx.save()
 
+#based on Derek Kwan chorus
+fx = FxList.new("chorus", "chorus", {"chorus":0, "chorusmix":1,  "chorusrate":1, "chorusmax":0.25, "chorusmin": 0.025, "lfos":0, "voices": 8}, order=2)
+fx.add("lfos = Array.fill(8, {SinOsc.ar(chorusrate * rrand(0.95, 1.05), rrand(0.0, 1.0), (chorusmax * 0.5) - chorusmin,  (chorusmax * 0.5) + chorusmin)})")
+fx.add("voices = DelayC.ar(osc, chorusmax,lfos)")
+fx.add("voices = Mix.ar(voices)")
+fx.add("osc = LinXFade2.ar(voices + osc, osc, 1-chorusmix)")
+fx.save()
+
+
 fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octamix':1, 'osc_low':0, 'osc_filtered':0}, order=2)
 fx.add("osc_low = LPF.ar(osc, 200)")
 fx.add("osc_low = osc_low * 4")
