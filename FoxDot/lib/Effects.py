@@ -403,8 +403,14 @@ fx = FxList.new("drive", "overdriveDistortion", {"drive":0, "drivemix":1}, order
 fx.add("osc = LinXFade2.ar((osc * (drive * 50)).clip(0,0.2).fold2(2), osc, 1-drivemix)")
 fx.save()
 
-fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octamix':1}, order=2)
-fx.add("osc = LinXFade2.ar(Clip.ar(TwoPole.ar(osc * (octafuz * 10), [60, 20000], 0.9), -0.75, 4).tanh, osc, 1-octamix)")
+fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octamix':1, 'osc_low':0, 'osc_filtered':0}, order=2)
+fx.add("osc_low = LPF.ar(osc, 200)")
+fx.add("osc_low = osc_low * 4")
+fx.add("osc_low = FreqShift.ar(osc_low, [200, 60])")
+fx.add("osc_filtered = LPF.ar(osc, 40)")
+fx.add("osc_filtered = LPF.ar(osc, 50)")
+fx.add("osc_filtered = Amplitude.ar(osc_low, attackTime:0.1, releaseTime: 0.5, mul: 4.0).abs")
+fx.add("osc = LinXFade2.ar((Clip.ar(TwoPole.ar(osc * ((osc_filtered * octafuz) * 10), [60, 20000], 0.9), -0.75, 4).tanh + osc_low) / 4, osc, 1-octamix)")
 fx.save()
 
 In(); Out()
