@@ -287,17 +287,17 @@ fx = FxList.new("pshift", "pitchShift", {"pshift":0}, order=0)
 fx.add("osc = osc * (1.059463**pshift)")
 fx.save()
 
-fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
-fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
-fx.save()
+#fx = FxList.new("fm_sin", "FrequencyModulationSine", {"fm_sin":0, "fm_sin_i":1}, order=0)
+#fx.add("osc = osc + (fm_sin_i * SinOsc.kr(osc * fm_sin))")
+#fx.save()
 
-fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
-fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
-fx.save()
+#fx = FxList.new("fm_saw", "FrequencyModulationSaw", {"fm_saw":0, "fm_saw_i":1}, order=0)
+#fx.add("osc = osc + (fm_saw_i * Saw.kr(osc * fm_saw))")
+#fx.save()
 
-fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
-fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
-fx.save()
+#fx = FxList.new("fm_pulse", "FrequencyModulationPulse", {"fm_pulse":0, "fm_pulse_i":1}, order=0)
+#fx.add("osc = osc + (fm_pulse_i * Pulse.kr(osc * fm_pulse))")
+#fx.save()
 
 # Signal effects
 
@@ -307,12 +307,14 @@ fx.add('osc = RHPF.ar(osc, hpf, hpr)')
 fx.save()
 
 fx = FxList.new('lpf','lowPassFilter', {'lpf': 0, 'lpr': 1, 'lpfslide':1, 'lpfend':0}, order=2)
-fx.add('lpfenv = EnvGen.ar(Env.new([lpf, lpfend], [lpfslide]));')
+fx.add_var("lpfenv")
+fx.add('lpfenv = EnvGen.ar(Env.new([lpf, lpfend], [lpfslide]))')
 fx.add('osc = RLPF.ar(osc, lpfenv, lpr)')
 fx.save()
 
-fx = FxList.new('npf','Notch', {'npf': 0, 'npr': 1}, order=2)
-fx.add('osc = Notch.ar(osc, npf, npr)')
+fx = FxList.new('mpf','MoogFF', {'mpf': 0, 'mpr': 0}, order=2)
+fx.doc("MoogFF filter")
+fx.add('osc = MoogFF.ar(osc, mpf, mpr,0,2)')
 fx.save()
 
 fx = FxList.new('swell','filterSwell', {'swell': 0, 'sus': 1, 'hpr': 1}, order=2)
@@ -405,15 +407,18 @@ fx.add("osc = LinXFade2.ar((osc * (drive * 50)).clip(0,0.2).fold2(2), osc, 1-dri
 fx.save()
 
 #based on Derek Kwan chorus
-fx = FxList.new("chorus", "chorus", {"chorus":0, "chorusmix":1,  "chorusrate":1, "chorusmax":0.25, "chorusmin": 0.025, "lfos":0, "voices": 8}, order=2)
+fx = FxList.new("chorus", "chorus", {"chorus":0, "chorusmix":1,  "chorusrate":1, "chorusmax":0.25, "chorusmin": 0.025}, order=2)
+fx.add_var("lfos")
+fx.add_var("voices=8")
 fx.add("lfos = Array.fill(8, {SinOsc.ar(chorusrate * rrand(0.95, 1.05), rrand(0.0, 1.0), (chorusmax * 0.5) - chorusmin,  (chorusmax * 0.5) + chorusmin)})")
 fx.add("voices = DelayC.ar(osc, chorusmax,lfos)")
 fx.add("voices = Mix.ar(voices)")
 fx.add("osc = LinXFade2.ar(voices + osc, osc, 1-chorusmix)")
 fx.save()
 
-
-fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octamix':1, 'osc_low':0, 'osc_filtered':0}, order=2)
+fx = FxList.new('octafuz', 'octafuz', {'octafuz': 0, 'octamix':1}, order=2)
+fx.add_var("osc_low")
+fx.add_var("osc_filtered")
 fx.add("osc_low = LPF.ar(osc, 200)")
 fx.add("osc_low = osc_low * 4")
 fx.add("osc_low = FreqShift.ar(osc_low, [200, 60])")

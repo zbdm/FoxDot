@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function
+### Crash Server Timer
+from .Extensions.timer.hack import *
 
 import os
 import sys
@@ -9,8 +11,8 @@ FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
 FoxDotCode.use_sample_directory(FOXDOT_SND)
 
 #OSC VIDEO FORWARD
-my_client = OSCClient() 
-my_client.connect((localhost, 12345)) # Video OSC Ip:port
+my_client = OSCClient()
+my_client.connect(("192.168.0.10", 12345)) # Video OSC Ip:port
 DefaultServer.forward = my_client
 
 #Video Synth

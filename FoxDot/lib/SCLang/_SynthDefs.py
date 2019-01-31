@@ -418,6 +418,10 @@ square.add()
 supersaw = FileSynthDef("supersaw")
 supersaw.add()
 
+video = FileSynthDef("video")
+video.add()
+
+
 # Get rid of the variable synth
 
 del synth
