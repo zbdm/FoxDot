@@ -4,6 +4,13 @@ FoxDot Crash Server Edition - Live Coding with Python v0.7.19
 
 CRASH SERVER EDITS
 =====================================
+31/01/2019 FX tweaking
+### Tweak LPF : adds env control on lpf with lpfslide (duration) & lpfend (end filter frequency)
+```python
+```p2 >> noise(lpf=40, sus=4, dur=4, lpfslide=1, lpfend=800)
+```
+### Tweak octafuz 
+### add first version of chorus with mix support 
 
 23/01/2019 Synth Tweaking
 ### tweak Faim, add ADSR enveloppe: reduce CPU, Lowshelf: less boomy
