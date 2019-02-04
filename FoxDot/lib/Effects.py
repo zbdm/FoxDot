@@ -314,7 +314,7 @@ fx.save()
 
 fx = FxList.new('mpf','MoogFF', {'mpf': 0, 'mpr': 0}, order=2)
 fx.doc("MoogFF filter")
-fx.add('osc = MoogFF.ar(osc, mpf, mpr,0,2)')
+fx.add('osc = MoogFF.ar(osc, mpf, mpr,0,1)')
 fx.save()
 
 fx = FxList.new('swell','filterSwell', {'swell': 0, 'sus': 1, 'hpr': 1}, order=2)
