@@ -4,11 +4,22 @@ FoxDot Crash Server Edition - Live Coding with Python v0.7.19
 
 CRASH SERVER EDITS
 =====================================
+
+05/02/2019 Snd Rearange & add
+### Change the default snd directory to crashSnd_mod for test ####
+### Nice sounds, try : 
+```python
+d1 >> play("K", sample=PStep(8,1), room=PStep(18,1,0), mix=0.2, dur=1, drive=(0,0.5), octafuz=12, octamix=0.5).every(8, "stutter", Cycle([2,3,12]))
+d2 >> play("-:", sample=7, mpf=5200, cut=0.9, amp=2, pan=(-1,1))
+d3 >> play("x:C=", sample=var([0,5],[12,4]), rate=1, drive=1, octafuz=12)
+```
+
 31/01/2019 FX tweaking
 ### Tweak LPF : adds env control on lpf with lpfslide (duration) & lpfend (end filter frequency)
 ```python
 ```p2 >> noise(lpf=40, sus=4, dur=4, lpfslide=1, lpfend=800)
 ```
+
 ### Tweak octafuz 
 ### add first version of chorus with mix support 
 
