@@ -421,6 +421,13 @@ supersaw.add()
 video = FileSynthDef("video")
 video.add()
 
+rsin = FileSynthDef("rsin")
+rsin.add()
+
+varicelle = FileSynthDef("varicelle")
+varicelle.add()
+
+
 
 # Get rid of the variable synth
 
