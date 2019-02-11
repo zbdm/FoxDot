@@ -306,7 +306,7 @@ fx.doc("Highpass filter")
 fx.add('osc = RHPF.ar(osc, hpf, hpr)')
 fx.save()
 
-fx = FxList.new('lpf','lowPassFilter', {'lpf': 0, 'lpr': 1, 'lpfslide':1, 'lpfend':0}, order=2)
+fx = FxList.new('lpf','lowPassFilter', {'lpf': 0, 'lpr': 1, 'lpfslide':1, 'lpfend':15000}, order=2)
 fx.add_var("lpfenv")
 fx.add('lpfenv = EnvGen.ar(Env.new([lpf, lpfend], [lpfslide]))')
 fx.add('osc = RLPF.ar(osc, lpfenv, lpr)')
