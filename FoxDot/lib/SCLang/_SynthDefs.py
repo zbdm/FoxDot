@@ -427,6 +427,8 @@ rsin.add()
 varicelle = FileSynthDef("varicelle")
 varicelle.add()
 
+sos = FileSynthDef("sos")
+sos.add()
 
 
 # Get rid of the variable synth
