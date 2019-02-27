@@ -15,6 +15,16 @@ import sys
 #my_client.connect(("127.0.0.1", 12345)) # Video OSC Ip:port
 #DefaultServer.forward = my_client
 
+class FilterOSCClient(OSCClient):
+    def send(self, message, *args):
+        if "video" in str(message.message):
+            OSCClient.send(self, message, *args)
+
+my_client = FilterOSCClient()
+my_client.connect(("localhost", 12345))
+DefaultServer.forward = my_client
+
+
 ##### SDur by Quantuum #####
 def SDur(target):
   from random import randint

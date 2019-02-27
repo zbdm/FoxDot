@@ -571,7 +571,6 @@ SynthDef(\saw3, {
 
 // Mod of «aurora borealis» by nicolaariutti
 
-(
 SynthDef.new(\varicelle,
 {|amp=1, sus=1, pan=0, freq=0, vib=0, fmod=0, rate=1, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.01, cutoff=5300, rel=0.01, peak=1, level=0.8, findex=0, frate=2|
 var osc, oscl, oscr, sigA, sigB, sigC, env, modul;
@@ -589,7 +588,28 @@ freq = In.kr(bus, 1);
 	osc = Mix(osc) * 0.5;
 	osc = Pan2.ar(osc, pan);
 ReplaceOut.ar(bus, osc)}).add;
-)
+
+
+SynthDef.new(\varsaw2,
+{|amp=1, sus=1, pan=0, freq=0, vib=0, fmod=0, rate=0, bus=0, blur=1, beat_dur=1, atk=0.01, decay=0.01, rel=0.01, peak=1, level=0.8|
+var osc, env, temp, sum;
+sus = sus * blur;
+freq = In.kr(bus, 1);
+freq = [freq, freq+fmod];
+sum = 0;
+10.do {
+			temp = VarSaw.ar(
+			freq*{Rand(0.99,1.02)}!2,
+			{Rand(0.0, 1.0)}!2,
+			{ExpRand(0.005,0.05)}!2);
+			sum = sum+temp};
+		osc = sum * 0.5;
+
+env = EnvGen.ar(Env([0, peak, level, level, 0], [atk, decay, max((atk + decay + rel), sus - (atk + decay + rel)), rel], curve:\sin), doneAction: 0);
+osc=(osc * env);
+//osc = Mix(osc);
+osc = Pan2.ar(osc, pan);
+	ReplaceOut.ar(bus, osc)}).add;
 
 //
 // SynthDef(\coreNoiz, {
