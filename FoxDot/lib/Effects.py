@@ -248,6 +248,22 @@ class EffectManager(dict):
 
 FxList = EffectManager()
 
+# Fx LOOP
+fx = FxList.new('fx1','fxout', {'fx1': 0, 'tmp1': 0, 'fx1_lvl':1}, order=0)
+fx.doc("FX1 Bus")
+fx.add("Out.ar(2, Mix.ar(osc*fx1_lvl))")
+fx.add("tmp1 = AudioIn.ar(1)")
+fx.add("osc = SelectX.ar(fx1, [osc, tmp1])*0.5")
+fx.save()
+
+fx = FxList.new('fx2','fx2out', {'fx2': 0, 'tmp2': 0, 'fx2_lvl':1}, order=0)
+fx.doc("FX2 Bus")
+fx.add("Out.ar(3, Mix.ar(osc*fx2_lvl))")
+fx.add("tmp2 = AudioIn.ar(2)")
+fx.add("osc = SelectX.ar(fx2, [osc, tmp2])*0.5")
+fx.save()
+
+
 # Frequency Effects
 
 fx = FxList.new("vib", "vibrato", {"vib": 0, "vibdepth": 0.02}, order=0)
@@ -350,21 +366,6 @@ if SC3_PLUGINS:
     fx.add("osc = LinXFade2.ar(CrossoverDistortion.ar(osc, amp:0.5*disto, smooth:smooth),  osc, 1-distomix)")
     fx.save()
 
-fx = FxList.new('fx','fxout', {'fx': 0, 'tmp': 0, 'fx_lvl':0.5}, order=2)
-fx.doc("FX Bus")
-fx.add("Out.ar(2, osc)")
-fx.add("tmp = AudioIn.ar(1)")
-fx.add("tmp = Mix(tmp) * fx_lvl * 0.5")
-fx.add("osc = SelectX.ar(fx, [osc, tmp+0.0001])")
-fx.save()
-
-fx = FxList.new('fx2','fx2out', {'fx2': 0, 'tmp2': 0, 'fx_lvl2':0.5}, order=2)
-fx.doc("FX Bus 2")
-fx.add("Out.ar(3, osc)")
-fx.add("tmp2 = AudioIn.ar(2)")
-fx.add("tmp2 = Mix(tmp2) * (fx_lvl2+0.001)")
-fx.add("osc = SelectX.ar(fx2, [osc, tmp2])")
-fx.save()
 
 
 # Envelope -- just include in the SynthDef and use asdr?

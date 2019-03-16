@@ -1,23 +1,30 @@
+#####  CRASH SERVER CUSTOM STARTUP ###########
+
+
 from __future__ import absolute_import, division, print_function
 ### Crash Server Timer
-#from .Extensions.timer.hack import *
+# from .Extensions.timer.hack import *
 
 import os
 import sys
 
-## Path Snd
-#FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd_mod/")
-#FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
-#FoxDotCode.use_sample_directory(FOXDOT_SND)
+#from .Extensions.Video.video2 import *    ### Video player
+#from .Extensions.speech.speech import *   ### Text2Speech
+from random import randint
 
-#OSC VIDEO FORWARD
-#my_client = OSCClient()
-#my_client.connect(("127.0.0.1", 12345)) # Video OSC Ip:port
-#DefaultServer.forward = my_client
+
+## Path Snd
+# FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd_mod/")
+# FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/crashsnd/_loop_/")
+# FoxDotCode.use_sample_directory(FOXDOT_SND)
+
+# OSC VIDEO FORWARD
+# my_client = OSCClient()
+# my_client.connect(("127.0.0.1", 12345)) # Video OSC Ip:port
+# DefaultServer.forward = my_client
 
 ##### SDur by Quantuum #####
 def SDur(target):
-  from random import randint
   sr = random.SystemRandom()
   indexes = random.randint(1,target+4)
   dividers = [1,1,1,2,2,2,2,4,8] # 1/4 and 1/8-typed notes get more scarce
@@ -36,7 +43,6 @@ def SDur(target):
 
 # variation giving shorter durations
 def SmDur(target):
-  from random import randint
   sr = random.SystemRandom()
   indexes = random.randint(1,target+4)
   dividers = [1,1,1,2,2,2,2,4,8] # 1/4 and 1/8-typed notes get more scarce
@@ -55,7 +61,6 @@ def SmDur(target):
 
 # a variation with score-like durations
 def ScDur(target):
-  from random import randint
   sr = random.SystemRandom()
   indexes = random.randint(1,target+4)
   standards = [0.25,0.375,0.75,0.5,1,2,3,4] # standard dur values found in scores
