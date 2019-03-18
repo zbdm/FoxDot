@@ -249,18 +249,18 @@ class EffectManager(dict):
 FxList = EffectManager()
 
 # Fx LOOP
-fx = FxList.new('fx1','fxout', {'fx1': 0, 'tmp1': 0, 'fx1_lvl':1}, order=0)
+fx = FxList.new('fx1','fxout', {'fx1': 0, 'tmp1': 0, 'fx1_lvl':1}, order=1)
 fx.doc("FX1 Bus")
 fx.add("Out.ar(2, Mix.ar(osc*fx1_lvl))")
 fx.add("tmp1 = AudioIn.ar(1)")
-fx.add("osc = SelectX.ar(fx1, [osc, tmp1])*0.5")
+fx.add("osc = SelectX.ar(fx1, [osc, tmp1])")
 fx.save()
 
-fx = FxList.new('fx2','fx2out', {'fx2': 0, 'tmp2': 0, 'fx2_lvl':1}, order=0)
+fx = FxList.new('fx2','fx2out', {'fx2': 0, 'tmp2': 0, 'fx2_lvl':1}, order=1)
 fx.doc("FX2 Bus")
 fx.add("Out.ar(3, Mix.ar(osc*fx2_lvl))")
 fx.add("tmp2 = AudioIn.ar(2)")
-fx.add("osc = SelectX.ar(fx2, [osc, tmp2])*0.5")
+fx.add("osc = SelectX.ar(fx2, [osc, tmp2])")
 fx.save()
 
 
