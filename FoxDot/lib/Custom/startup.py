@@ -9,9 +9,10 @@ import os
 import sys
 
 #from .Extensions.Video.video2 import *    ### Video player
-#from .Extensions.speech.speech import *   ### Text2Speech
+from .Extensions.speech.voice import *   ### Text2Speech
 from random import randint
 
+#from .Custom.crashserver_set import *
 
 ## Path Snd
 # FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/crashsnd_mod/")
@@ -22,6 +23,58 @@ from random import randint
 # my_client = OSCClient()
 # my_client.connect(("127.0.0.1", 12345)) # Video OSC Ip:port
 # DefaultServer.forward = my_client
+
+
+#########################
+### CRASH SERVER SET  ###
+#########################
+
+
+##### PART I : INTRODUCTION ################ 
+
+
+def initial():        
+    voix = Voix(lang="fr", rate=0.45, amp=1.0)
+    def voix1():
+      voix.say(voix.get_text())
+      voix.stop()
+
+    Clock.future(16, lambda: voix1())
+    
+
+def intro():
+    Clock.bpm=95
+    Scale.default="minor"
+
+    
+
+    def smpl():   
+      z1 >> play("z...", mpf=expvar([10,4800],[16,inf], start=now), amp=0.7)
+      i2 >> play("I.....", amp=linvar([0,0.7],[32,inf], start=now), dur=4, rate=-0.5)
+ 
+
+    r1 >> sos(dur=8, mpf=linvar([60,3800],[24, inf], start=now))
+    Clock.future(8, lambda: smpl())
+    Clock.future(20, lambda: initial())
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##### SDur by Quantuum #####
 def SDur(target):
@@ -86,3 +139,6 @@ def ScDur(target):
       if sum(list) < target:
           list.append(target-sum(list))
   return P[list].shuffle() # always return a list of durations with total duration equals target
+
+
+
