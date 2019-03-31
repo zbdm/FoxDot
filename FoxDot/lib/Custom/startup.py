@@ -29,33 +29,44 @@ from random import randint
 ### CRASH SERVER SET  ###
 #########################
 
+### Longueur mesure d'intro
+tmps = 4
+### Language
+lang = "fr"
+### BPM intro
+bpm_intro = 95
+### Scale intro 
+scale_intro = "minor"
+### Root intro
+root_intro = "E"
+
 
 ##### PART I : INTRODUCTION ################ 
 
 
-def initial():        
-    voix = Voix(lang="fr", rate=0.45, amp=1.0)
-    def voix1():
-      voix.say(voix.get_text())
-      voix.stop()
 
-    Clock.future(16, lambda: voix1())
+def initial():       
+    voix = Voix(lang=lang, rate=0.45, amp=1.0)
+    voix.initi()
+    def voix1():
+      voix.intro()
+
+    Clock.future(tmps, lambda: voix1())
     
 
 def intro():
-    Clock.bpm=95
-    Scale.default="minor"
-
-    
+    Clock.bpm = bpm_intro
+    Scale.default = scale_intro
+    Root.default = root_intro
 
     def smpl():   
-      z1 >> play("z...", mpf=expvar([10,4800],[16,inf], start=now), amp=0.7)
-      i2 >> play("I.....", amp=linvar([0,0.7],[32,inf], start=now), dur=4, rate=-0.5)
+      z1 >> play("z...", mpf=expvar([10,4800],[tmps,inf], start=now), amp=0.7)
+      i2 >> play("I.....", amp=linvar([0,0.7],[tmps*2,inf], start=now), dur=4, rate=-0.5)
  
 
-    r1 >> sos(dur=8, mpf=linvar([60,3800],[24, inf], start=now))
-    Clock.future(8, lambda: smpl())
-    Clock.future(20, lambda: initial())
+    r1 >> sos(dur=8, mpf=linvar([60,3800],[tmps*1.5, inf], start=now))
+    Clock.future(tmps/2, lambda: smpl())
+    Clock.future(tmps*1.5, lambda: initial())
 
 
 

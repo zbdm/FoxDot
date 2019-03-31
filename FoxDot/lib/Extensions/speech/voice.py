@@ -1,3 +1,4 @@
+# coding: utf8
 #!/usr/bin/env python3
 
 import os # Allows checking if using Windows
@@ -19,14 +20,14 @@ except:
 	raise RuntimeError("Windows is required.")
 
 
-class Voix():
+class Voix(Thread):
 	""" CRASH SERVER - TEXT 2 SPEECH
 		A text to speech thread using the Microsoft SAPI through COM
 		Foxdot implantation
 		"""
 
 	def __init__(self, text="", rate=0.5, amp=1.0, voix=2, lang="eng"):
-		super().__init__()
+		Thread.__init__(self)
 		pythoncom.CoInitialize()
 		self.voice = comtypes.client.CreateObject('Sapi.SpVoice')
 		self.voice_win = ["Hortense", "Zira", "David"]
@@ -35,23 +36,25 @@ class Voix():
 		self.amp = float(amp)
 		self.voix = voix
 		self.lang = lang
-		self.crash_text = ""
-		self.crash_text_path = ""
 		self.main()
-		self.text = self.text_init
-		#print(self.crash_text_path)
-		#print(self.crash_text)
 		self.thread = Thread(target=self.say, kwargs={'text': self.text})
 		self.thread.start()
 		
-
 	def main(self):
 		self.set_rate(self.rate)  # Speed of speech
 		self.set_amp(self.amp)    # Volume 
+		self.select_lang(self.lang)
+		self.set_voice(self.voix) # This is the VOICE 
+
+	def initi(self):
 		self.crash_text_path = self.select_lang(self.lang) # return the .txt EN/FR/NL/... 
 		self.crash_text = self.text_as_list(self.crash_text_path) # return the text as a list	
-		self.set_voice(self.voix) # This is the VOICE 
-		
+		self.set_voice(self.voix)
+		print(self.crash_text)
+		self.say(self.text_init)
+
+	def intro(self):
+		self.say(self.crash_text)	
 
 	def select_lang(self, lang):
 		"""Select the .txt according to language selected"""
@@ -63,26 +66,24 @@ class Voix():
 			crash_text = "crash_text_eng.txt"
 			self.text_init = "Initialized server"
 			self.voix = 2
-		return os.path.join(os.getcwd(), "FoxDot", "lib", "Extensions", "speech", crash_text)
+		return os.path.join(os.getcwd(), "FoxDot", "lib", "Extensions", "speech", crash_text)	
+		#return os.path.join(os.getcwd(), crash_text)
 
 	def text_as_list(self, text_path):
 		""" Transform a .txt file into a list for each line""" 
 		text_list = []
-		with open(text_path) as text:  
+		with open(text_path, 'r', encoding='utf-8') as text:  
 			line = text.readline()
 			while line:
 				text_list.append(line.rstrip('\n'))
 				line = text.readline()
+			print(text_list)
 			return text_list
 
 	def get_text_length(self):
 		"""return the number of line, use in FoxDot"""
 		length = len(self.crash_text)
 		return length
-
-	def get_text(self):
-		""" return a line of text"""
-		return self.crash_text
 
 	def say(self, text):
 		""" Say the text """
@@ -181,4 +182,3 @@ class Voix():
 
 if __name__ == '__main__':
 	v = Voix(lang="fr")
-	v.say(v.get_text())
